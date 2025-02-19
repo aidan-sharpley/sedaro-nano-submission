@@ -15,7 +15,7 @@ import { Routes } from 'routes';
 type FormValue = number | '';
 
 type Body = {
-	id: number;
+	agentId: number;
 	x: FormValue;
 	y: FormValue;
 	z: FormValue;
@@ -31,7 +31,7 @@ type FormData = {
 };
 
 const defaultBody1: Body = {
-	id: 1,
+	agentId: 1,
 	x: -0.73,
 	y: 0,
 	z: 0,
@@ -42,7 +42,7 @@ const defaultBody1: Body = {
 };
 
 const defaultBody2: Body = {
-	id: 2,
+	agentId: 2,
 	x: 60.34,
 	y: 0,
 	z: 0,
