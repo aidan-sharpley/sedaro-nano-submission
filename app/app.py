@@ -1,28 +1,29 @@
 # HTTP SERVER
 
 import json
+from typing import cast
 
 from flask import Flask, request
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-from models import Body
+from models import SimulateRequest
 from simulator import Simulator
 from store import QRangeStore
 
 
 class Base(DeclarativeBase):
-    pass
+	pass
 
 
 ############################## Application Configuration ##############################
 
 app = Flask(__name__)
-CORS(app, origins=["http://localhost:3030"])
+CORS(app, origins=['http://localhost:3030'])
 
 db = SQLAlchemy(model_class=Base)
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 db.init_app(app)
 
 
@@ -30,53 +31,55 @@ db.init_app(app)
 
 
 class Simulation(db.Model):
-    id: Mapped[int] = mapped_column(primary_key=True)
-    data: Mapped[str]
+	id: Mapped[int] = mapped_column(primary_key=True)
+	data: Mapped[str]
 
 
 with app.app_context():
-    db.create_all()
+	db.create_all()
 
 
 ############################## API Endpoints ##############################
 
 
-@app.get("/")
+@app.get('/')
 def health():
-    return "<p>Sedaro Nano API - running!</p>"
+	return '<p>Sedaro Nano API - running!</p>'
 
 
-@app.get("/simulation")
+@app.get('/simulation')
 def get_data():
-    # Get most recent simulation from database
-    simulation: Simulation = Simulation.query.order_by(Simulation.id.desc()).first()
-    return simulation.data if simulation else []
+	# Get most recent simulation from database
+	simulation: Simulation = Simulation.query.order_by(Simulation.id.desc()).first()
+	return simulation.data if simulation else []
 
 
-@app.post("/simulation")
+@app.post('/simulation')
 def simulate():
-    # Get data from request in this form
-    # init = {
-    #     "Body1": {"x": 0, "y": 0.1, "vx": 0.1, "vy": 0},
-    #     "Body2": {"x": 0, "y": 1, "vx": 1, "vy": 0},
-    # }
+	# Get data from request in this form
+	# init = {
+	#     "Body1": {"x": 0, "y": 0.1, "vx": 0.1, "vy": 0},
+	#     "Body2": {"x": 0, "y": 1, "vx": 1, "vy": 0},
+	# }
 
-    # Define time and timeStep for each agent
-    init: dict[str, Body] = request.json
-    for key in init.keys():
-        init[key]["time"] = 0
-        init[key]["timeStep"] = 0.01
+	# Define time and timeStep for each agent
+	if (
+		request.json is not type(SimulateRequest)
+		or len(cast(SimulateRequest, request.json).data) == 0
+	):
+		return '', 400
 
-    # Create store and simulator
-    store = QRangeStore()
-    simulator = Simulator(store=store, init=init)
+	payload: SimulateRequest = request.json  # type: ignore
 
-    # Run simulation
-    simulator.simulate()
+	# Create store and simulator
+	simulator = Simulator(store=QRangeStore(), init=payload.data)
 
-    # Save data to database
-    simulation = Simulation(data=json.dumps(store.store))
-    db.session.add(simulation)
-    db.session.commit()
+	# Run simulation
+	simulator.simulate()
 
-    return store.store
+	# Save data to database
+	simulation = Simulation(data=json.dumps(store.store))
+	db.session.add(simulation)
+	db.session.commit()
+
+	return store.store
