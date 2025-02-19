@@ -7,7 +7,7 @@ from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-from models import Body, LegacySimulateRequest
+from models import SimulateRequest
 from simulator import Simulator
 from store import QRangeStore
 
@@ -55,25 +55,28 @@ def get_data():
 
 @app.post('/simulation')
 def simulate():
-    try:
-        json_object = request.get_json()
-        if not json_object:
-            print('failed to parse due to empty request')
-            return 'bad request', 400
+    # payload = None
 
-        # payloadDict = json.loads(payload)
+    # try:
+    #     json_object = request.get_json()
+    #     if not json_object:
+    #         print('failed to parse json from request')
+    #         return 'bad request', 400
 
-        payload = LegacySimulateRequest(
-            Body1=Body(**json_object['Body1']), Body2=Body(**json_object['Body2'])
-        )
+    #     # payloadDict = json.loads(payload)
 
-        print('wakka wakka')
-        print(payload.Body1.id)
-        print(type(payload.Body1))
+    #     payload = SimulateRequest(**json_object)
+    #     if len(payload.data) == 0:
+    #         print('failed to parse due to empty request')
+    #         return 'bad request', 400
 
-    except Exception as e:
-        print(f'failed to parse, {e}')
-        return 'bad request', 400
+    #     print('wakka wakka')
+    #     print(payload.data[0].agentId)
+    #     print(type(payload))
+
+    # except Exception as e:
+    #     print(f'failed to parse due to unknown exception, {e}')
+    #     return 'bad request', 400
 
     # print(req.Body1.id)
     # data = request.get_json()  # Get the JSON data from the request
@@ -88,11 +91,28 @@ def simulate():
     #     return 'Failed to parse request', 400
     #  TODO ^^^^
 
+    json_object = request.get_json()
+    if not json_object:
+        print('failed to parse json from request')
+        return 'bad request', 400
+
+    # payloadDict = json.loads(payload)
+
+    payload = SimulateRequest(**json_object)
+    if len(payload.data) == 0:
+        print('failed to parse due to empty request')
+        return 'bad request', 400
+
+    print('wakka wakka')
+    print(payload.data[0].agentId)
+    print(type(payload))
+
     # Create store and simulator
     # initial_universe = {agentId: state for agentId, state in enumerate(init)}
+    store = QRangeStore()
     simulator = Simulator(
-        store=QRangeStore(),
-        init=payload,
+        store=store,
+        init=payload.data,
     )
 
     # Run simulation

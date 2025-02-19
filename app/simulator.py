@@ -3,7 +3,7 @@
 from functools import reduce
 from operator import __or__
 
-from models import LegacySimulateRequest
+from models import Body
 from modsim import propagate
 from store import QRangeStore
 
@@ -27,19 +27,21 @@ class Simulator:
 
     Args:
         store (QRangeStore): The data store in which to save the simulation results.
-        init (SimulateRequest): The initial state of the universe.
+        init (list[Body]): The initial state of the universe.
     """
 
-    def __init__(self, store: QRangeStore, init: LegacySimulateRequest):
+    def __init__(self, store: QRangeStore, init: list[Body]):
+        initial_universe_dict = {state.agentId: state for state in init}
+
         self.store = store
-        store[-999999999, 0] = init
-        self.init = init
+        # HUH? TODO
+        self.store[-999999999, 0] = initial_universe_dict
+        self.init = initial_universe_dict
         self.times = {
-            'Body1': init.Body1.time,
-            'Body2': init.Body2.time,
+            agent_id: state.time for agent_id, state in initial_universe_dict.items()
         }
 
-    def read(self, t):
+    def read(self, t: int) -> Body:
         try:
             data = self.store[t]
         except IndexError:
@@ -48,10 +50,10 @@ class Simulator:
 
     def simulate(self, iterations: int = 500):
         for _ in range(iterations):
-            for agentId, _ in enumerate(self.init):
+            for agentId in self.init:
                 t = self.times[agentId]
                 universe = self.read(t - 0.001)
                 if set(universe) == set(self.init):
                     newState = propagate(agentId, universe)
-                    self.store[t, newState['time']] = {agentId: newState}
-                    self.times[agentId] = newState['time']
+                    self.store[t, newState.time] = {agentId: newState}
+                    self.times[agentId] = newState.time
