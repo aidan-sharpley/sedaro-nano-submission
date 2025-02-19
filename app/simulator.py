@@ -3,7 +3,7 @@
 from functools import reduce
 from operator import __or__
 
-from models import Body
+from models import LegacySimulateRequest
 from modsim import propagate
 from store import QRangeStore
 
@@ -30,14 +30,13 @@ class Simulator:
         init (SimulateRequest): The initial state of the universe.
     """
 
-    def __init__(self, store: QRangeStore, init: list[Body]):
-        initial_universe = {agentId: state for agentId, state in enumerate(init)}
-
+    def __init__(self, store: QRangeStore, init: LegacySimulateRequest):
         self.store = store
-        store[-999999999, 0] = initial_universe
-        self.init = initial_universe
+        store[-999999999, 0] = init
+        self.init = init
         self.times = {
-            agentId: state.time for agentId, state in initial_universe.items()
+            'Body1': init.Body1.time,
+            'Body2': init.Body2.time,
         }
 
     def read(self, t):

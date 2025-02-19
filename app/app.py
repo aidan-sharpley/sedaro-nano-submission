@@ -1,20 +1,19 @@
 # HTTP SERVER
 
 import json
-from typing import cast
 
 from flask import Flask, request
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-from models import SimulateRequest
+from models import Body, LegacySimulateRequest
 from simulator import Simulator
 from store import QRangeStore
 
 
 class Base(DeclarativeBase):
-	pass
+    pass
 
 
 ############################## Application Configuration ##############################
@@ -31,12 +30,12 @@ db.init_app(app)
 
 
 class Simulation(db.Model):
-	id: Mapped[int] = mapped_column(primary_key=True)
-	data: Mapped[str]
+    id: Mapped[int] = mapped_column(primary_key=True)
+    data: Mapped[str]
 
 
 with app.app_context():
-	db.create_all()
+    db.create_all()
 
 
 ############################## API Endpoints ##############################
@@ -44,42 +43,64 @@ with app.app_context():
 
 @app.get('/')
 def health():
-	return '<p>Sedaro Nano API - running!</p>'
+    return '<p>Sedaro Nano API - running!</p>'
 
 
 @app.get('/simulation')
 def get_data():
-	# Get most recent simulation from database
-	simulation: Simulation = Simulation.query.order_by(Simulation.id.desc()).first()
-	return simulation.data if simulation else []
+    # Get most recent simulation from database
+    simulation: Simulation = Simulation.query.order_by(Simulation.id.desc()).first()
+    return simulation.data if simulation else []
 
 
 @app.post('/simulation')
 def simulate():
-	# Get data from request in this form
-	# init = {
-	#     "Body1": {"x": 0, "y": 0.1, "vx": 0.1, "vy": 0},
-	#     "Body2": {"x": 0, "y": 1, "vx": 1, "vy": 0},
-	# }
+    try:
+        json_object = request.get_json()
+        if not json_object:
+            print('failed to parse due to empty request')
+            return 'bad request', 400
 
-	# Define time and timeStep for each agent
-	if (
-		request.json is not type(SimulateRequest)
-		or len(cast(SimulateRequest, request.json).data) == 0
-	):
-		return '', 400
+        # payloadDict = json.loads(payload)
 
-	payload: SimulateRequest = request.json  # type: ignore
+        payload = LegacySimulateRequest(
+            Body1=Body(**json_object['Body1']), Body2=Body(**json_object['Body2'])
+        )
 
-	# Create store and simulator
-	simulator = Simulator(store=QRangeStore(), init=payload.data)
+        print('wakka wakka')
+        print(payload.Body1.id)
+        print(type(payload.Body1))
 
-	# Run simulation
-	simulator.simulate()
+    except Exception as e:
+        print(f'failed to parse, {e}')
+        return 'bad request', 400
 
-	# Save data to database
-	simulation = Simulation(data=json.dumps(store.store))
-	db.session.add(simulation)
-	db.session.commit()
+    # print(req.Body1.id)
+    # data = request.get_json()  # Get the JSON data from the request
+    # user_dict = json.loads(data)  # Convert JSON to dictionary
+    # user = User(**user_dict)  # Convert dictionary to class instance
 
-	return store.store
+    # TODO
+    # payload = request.json
+    # payload: SimulateRequest = request.json  # type: ignore
+    # if len(cast(SimulateRequest, request.json).data) == 0:
+    #     print(f'failed to parse body of request, {request}, {request.json}')
+    #     return 'Failed to parse request', 400
+    #  TODO ^^^^
+
+    # Create store and simulator
+    # initial_universe = {agentId: state for agentId, state in enumerate(init)}
+    simulator = Simulator(
+        store=QRangeStore(),
+        init=payload,
+    )
+
+    # Run simulation
+    simulator.simulate()
+
+    # Save data to database
+    simulation = Simulation(data=json.dumps(store.store))
+    db.session.add(simulation)
+    db.session.commit()
+
+    return store.store

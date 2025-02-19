@@ -2,7 +2,7 @@ DEFAULT_TIME_VALUE = 0
 DEFAULT_TIME_STEP_VALUE = 0.01
 
 
-class Body:
+class Body(object):
     def __init__(
         self,
         id: int = 0,
@@ -27,6 +27,18 @@ class Body:
         self.time = time
         self.timeStep = timeStep
 
+    # def __repr__(self):
+    #     return f'Body(id={self.id}, x={self.x}, y={self.y}, z={self.z}, vx={self.vx}, vy={self.vy}, vz={self.vz}, mass={self.mass}, time={self.time}, timeStep={self.timeStep})'
 
-class SimulateRequest:
+
+class SimulateRequest(object):
     data: list[Body]
+
+
+class LegacySimulateRequest(object):
+    def __init__(self, Body1: Body, Body2: Body):
+        self.Body1 = Body1
+        self.Body2 = Body2
+
+    # def __repr__(self):
+    #     return f'LegacySimulateRequest(Body1={self.Body1}, Body2={self.Body2})'
