@@ -5,8 +5,10 @@ import json
 from flask import Flask, request
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
-from simulator import Simulator
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+
+from models import Body
+from simulator import Simulator
 from store import QRangeStore
 
 
@@ -60,7 +62,7 @@ def simulate():
     # }
 
     # Define time and timeStep for each agent
-    init: dict = request.json
+    init: dict[str, Body] = request.json
     for key in init.keys():
         init[key]["time"] = 0
         init[key]["timeStep"] = 0.01
