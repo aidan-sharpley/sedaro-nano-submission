@@ -1,7 +1,6 @@
 # HTTP SERVER
 
 
-import jsonpickle
 from flask import Flask, request
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
@@ -50,7 +49,7 @@ def health():
 def get_data():
     # Get most recent simulation from database
     simulation: Simulation = Simulation.query.order_by(Simulation.id.desc()).first()
-    return jsonpickle.loads(simulation.data) if simulation else []
+    return simulation.data if simulation else []
 
 
 @app.post('/simulation')
@@ -59,12 +58,6 @@ def simulate():
     if not payload:
         print('failed to parse json from request')
         return 'bad request', 400
-
-    print('wakka wakka')
-    print(payload.Body1.agentId)
-    print(payload.Body2)
-    print(payload)
-    print(type(payload))
 
     # Create store and simulator
     simulator = Simulator(
@@ -75,23 +68,10 @@ def simulate():
     # Run simulation
     simulator.simulate()
 
-    print('simmlated')
-
     # Save data to database
     simulation = Simulation(data=simulator.marshalStoreContents())
-    # simulation = Simulation(data=json.dumps(store.store))
-    # storeData = json.dumps([s for s in store.store])
-    # simulation = Simulation(data=storeData)
 
-    # self.store: list[tuple[int, int, dict[str, Body]]]
-
-    # simulation = Simulation(data=store.store)
     db.session.add(simulation)
     db.session.commit()
 
-    # print(store.store[-1])
-    # print(store.store[-1][2]['Body2'].mass)
-
-    # return store.store
-    # return jsonpickle.dumps(store.store)
     return simulation.data

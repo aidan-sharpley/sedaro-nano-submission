@@ -72,19 +72,14 @@ class Simulator:
         """
         t = self.times[primaryAgentId]
         universe = self.read(t - DEFAULT_SIMULATION_DECR)
-        print('brekky')
-        print(universe)
-        print(primaryAgentId)
-        print(t)
+
         # Check new simulated universe if
         # it is back to initial state.
         if set(universe) == self.initialSet:
-            print('we are equal ')
             newState = propagate(
                 self_state=universe[primaryAgentId],
                 other_state=universe[secondaryAgentId],
             )
-            print(newState)
             self.store[t, newState.time] = {primaryAgentId: newState}
             self.times[primaryAgentId] = newState.time
 

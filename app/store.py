@@ -49,17 +49,9 @@ class QRangeStore:
         if not low < high:
             raise IndexError('Invalid Range.')
         self.store.append((low, high, value))
-        print('say what')
-        print({k: str(v) for k, v in value.items()})
-        print(value.items())
-        # print(value)
-        # print(json.dumps(value))
-        # print(json.dumps(((low, high, {k: asdict(v) for k, v in value.items()}))))
         self.marshalStore.append(
             ((low, high, {k: asdict(v) for k, v in value.items()}))
         )
-        print('hmmm')
-        print(self.marshalStore[-1])
 
     def __getitem__(self, key: int | float):
         ret = [v for (low, high, v) in self.store if low <= key < high]
