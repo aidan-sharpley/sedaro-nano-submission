@@ -37,6 +37,7 @@ class Body:
 #         self.data = [Body(**x) for x in data]
 
 
+@dataclass
 class SimulateRequest:
     def __init__(self, data: dict[str, Body]):
         if len(data.keys()) != 2:

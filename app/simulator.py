@@ -3,7 +3,7 @@
 from functools import reduce
 from operator import __or__
 
-from models import Body
+from models import Body, SimulateRequest
 from modsim import propagate
 from store import QRangeStore
 
@@ -32,12 +32,20 @@ class Simulator:
         init (list[Body]): The initial state of the universe.
     """
 
-    def __init__(self, store: QRangeStore, init: dict[str, Body]):
+    def __init__(self, store: QRangeStore, init: SimulateRequest):
+        initialUniverseDict = {
+            init.Body1.agentId: init.Body1,
+            init.Body2.agentId: init.Body2,
+        }
+
         self.store = store
         # range where value should show up
-        store[-999999999, 0] = init
-        self.init = init
-        self.times = {agent_id: state.time for agent_id, state in init.items()}
+        store[-999999999, 0] = initialUniverseDict
+        self.init = initialUniverseDict
+        self.times = {
+            init.Body1.agentId: init.Body1.time,
+            init.Body2.agentId: init.Body2.time,
+        }
 
     def read(self, t: float) -> dict[int, Body]:
         try:
@@ -50,13 +58,13 @@ class Simulator:
 
     def simulate(self, iterations: int = 500):
         print('in simulacrum')
-        print(self.init)
-        print(self.store)
-        print(self.times)
+        # print(self.init)
+        # print(self.store)
+        # print(self.times)
 
         for _ in range(iterations):
             # TODO parallel?
-            for agentId in self.init.keys():
+            for agentId in self.init:
                 t = self.times[agentId]
                 universe = self.read(t - DEFAULT_SIMULATION_DECR)
                 print('brekky')

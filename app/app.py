@@ -113,6 +113,9 @@ def simulate():
     # Run simulation
     simulator.simulate()
 
+    print('simmlated')
+    # print(store.store)
+
     # Save data to database
     simulation = Simulation(data=jsonpickle.dumps(store.store))
     db.session.add(simulation)
