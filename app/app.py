@@ -1,7 +1,7 @@
 # HTTP SERVER
 
-import json
 
+import jsonpickle
 from flask import Flask, request
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
@@ -50,7 +50,7 @@ def health():
 def get_data():
     # Get most recent simulation from database
     simulation: Simulation = Simulation.query.order_by(Simulation.id.desc()).first()
-    return simulation.data if simulation else []
+    return jsonpickle.loads(simulation.data) if simulation else []
 
 
 @app.post('/simulation')
@@ -119,7 +119,7 @@ def simulate():
     simulator.simulate()
 
     # Save data to database
-    simulation = Simulation(data=json.dumps(store.store))
+    simulation = Simulation(data=jsonpickle.dumps(store.store))
     db.session.add(simulation)
     db.session.commit()
 

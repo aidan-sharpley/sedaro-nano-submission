@@ -34,8 +34,8 @@ class Simulator:
         initial_universe_dict = {state.agentId: state for state in init}
 
         self.store = store
-        # HUH? TODO
-        self.store[-999999999, 0] = initial_universe_dict
+        # range where value should show up
+        store[-999999999, 0] = initial_universe_dict
         self.init = initial_universe_dict
         self.times = {
             agent_id: state.time for agent_id, state in initial_universe_dict.items()
@@ -50,7 +50,7 @@ class Simulator:
 
     def simulate(self, iterations: int = 500):
         for _ in range(iterations):
-            for agentId in self.init:
+            for agentId in self.init.keys():
                 t = self.times[agentId]
                 universe = self.read(t - 0.001)
                 if set(universe) == set(self.init):

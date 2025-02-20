@@ -1,10 +1,11 @@
-from types import SimpleNamespace
+from dataclasses import dataclass
 
 DEFAULT_TIME_VALUE = 0
 DEFAULT_TIME_STEP_VALUE = 0.01
 
 
-class Body(SimpleNamespace):
+@dataclass
+class Body:
     def __init__(
         self,
         agentId: int = 0,
@@ -30,12 +31,7 @@ class Body(SimpleNamespace):
         self.timeStep = timeStep
 
 
+@dataclass
 class SimulateRequest:
     def __init__(self, data: list[Body]):
         self.data = [Body(**x) for x in data]
-
-
-class LegacySimulateRequest(object):
-    def __init__(self, Body1: Body, Body2: Body):
-        self.Body1 = Body1
-        self.Body2 = Body2

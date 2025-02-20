@@ -2,6 +2,8 @@
 
 import doctest
 
+from models import Body
+
 
 class QRangeStore:
     """
@@ -35,21 +37,21 @@ class QRangeStore:
     """
 
     def __init__(self):
-        self.store = []
+        self.store: list[tuple[int, int, Body]] = []
 
     def __setitem__(self, rng, value):
         try:
             (low, high) = rng
         except (TypeError, ValueError):
-            raise IndexError("Invalid Range: must provide a low and high value.")
+            raise IndexError('Invalid Range: must provide a low and high value.')
         if not low < high:
-            raise IndexError("Invalid Range.")
+            raise IndexError('Invalid Range.')
         self.store.append((low, high, value))
 
-    def __getitem__(self, key):
-        ret = [v for (l, h, v) in self.store if l <= key < h]
+    def __getitem__(self, key: int | float):
+        ret = [v for (low, high, v) in self.store if low <= key < high]
         if not ret:
-            raise IndexError("Not found.")
+            raise IndexError('Not found.')
         return ret
 
 
