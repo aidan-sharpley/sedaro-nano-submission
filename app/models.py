@@ -8,7 +8,7 @@ DEFAULT_TIME_STEP_VALUE = 0.01
 class Body:
     def __init__(
         self,
-        agentId: int = 0,
+        agentId: str = '',
         x: float = 0,
         y: float = 0,
         z: float = 0,

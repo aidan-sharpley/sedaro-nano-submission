@@ -114,7 +114,10 @@ def simulate():
     simulator.simulate()
 
     print('simmlated')
-    # print(store.store)
+    # print(store.store[-1][2][2].time)
+    # print(type(store.store[-1][2][2]))
+    print(jsonpickle.dumps(store.store))
+    print(jsonpickle.loads(jsonpickle.dumps(store.store))[-1][2])
 
     # Save data to database
     simulation = Simulation(data=jsonpickle.dumps(store.store))

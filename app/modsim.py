@@ -7,18 +7,11 @@ import numpy as np
 from models import Body
 
 
-def propagate(agent_id: int, universe: dict[int, Body]) -> Body:
+def propagate(self_state: Body, other_state: Body) -> Body:
     """Propagate agentId from `time` to `time + timeStep`."""
     # Get simulation state
-    self_state = universe[agent_id]
     time = self_state.time
     time_step = self_state.timeStep
-
-    if agent_id == 1:
-        other_body = 2
-    else:
-        other_body = 1
-    other_state = universe[other_body]
 
     # Use law of gravitation to update position and velocity
     r_self = np.array([self_state.x, self_state.y, self_state.z])
