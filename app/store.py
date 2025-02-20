@@ -37,7 +37,7 @@ class QRangeStore:
     """
 
     def __init__(self):
-        self.store: list[tuple[int, int, dict[int, Body]]] = []
+        self.store: list[tuple[int, int, dict[str, Body]]] = []
 
     def __setitem__(self, rng, value):
         try:

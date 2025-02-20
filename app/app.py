@@ -116,12 +116,16 @@ def simulate():
     print('simmlated')
     # print(store.store[-1][2][2].time)
     # print(type(store.store[-1][2][2]))
-    print(jsonpickle.dumps(store.store))
-    print(jsonpickle.loads(jsonpickle.dumps(store.store))[-1][2])
+    # print(jsonpickle.dumps(store.store))
+    # print(jsonpickle.loads(jsonpickle.dumps(store.store))[-1][2])
 
     # Save data to database
     simulation = Simulation(data=jsonpickle.dumps(store.store))
     db.session.add(simulation)
     db.session.commit()
 
+    print(store.store[-1])
+    print(store.store[-1][2]['Body2'].mass)
+
     return store.store
+    # return jsonpickle.dumps(store.store)
