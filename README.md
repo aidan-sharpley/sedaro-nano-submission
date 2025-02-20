@@ -1,3 +1,38 @@
+# Submission Notes
+
+-
+
+IDEAS
+Simulator:
+Improve the Q-Range KV Store data structure
+Make the system more generic/extensible
+Make it fast
+
+Front End:
+Revamp the UI/UX with cool visualizations and interactivity
+Live-stream the simulation
+Show off your best creative work with a redesign
+
+App
+Add unique patterns of user engagement
+Make the simulation runtime parallel/asynchronous
+
+Data:
+Create a more scalable storage solution than a JSON string in one DB row
+Do some statistical analysis on the data
+Set up background jobs to preprocess data
+
+Modeling & Simulation:
+Improve the numerical stability of the simulation functions
+Implement additional modeling and simulation scope
+Analyze the sensitivity to initial conditions
+
+Etc:
+Incorporate computational optimizations (e.g. linear programming)
+Whatever you want; these are just suggestions to get you thinking
+
+---
+
 # Sedaro Nano
 
 The tiniest possible mockup of our system
