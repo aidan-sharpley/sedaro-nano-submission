@@ -91,14 +91,10 @@ def simulate():
     #     return 'Failed to parse request', 400
     #  TODO ^^^^
 
-    json_object = request.get_json()
-    if not json_object:
+    payload = SimulateRequest(request.get_json())
+    if not payload:
         print('failed to parse json from request')
         return 'bad request', 400
-
-    # payloadDict = json.loads(payload)
-
-    payload = SimulateRequest(json_object)
 
     print('wakka wakka')
     print(payload.Body1.agentId)
