@@ -55,8 +55,6 @@ class Simulator:
     def read(self, t: float) -> dict[str, Body]:
         try:
             data = self.store[t]
-            print('reading rainbow')
-            print(data)
         except IndexError:
             data = []
         return reduce(__or__, data, {})  # combine all data into one dictionary
