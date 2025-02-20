@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from typing import Any
 
 DEFAULT_TIME_VALUE = 0
 DEFAULT_TIME_STEP_VALUE = 0.01
@@ -32,7 +31,21 @@ class Body:
         self.timeStep = timeStep
 
 
-@dataclass
+# @dataclass
+# class SimulateRequest:
+#     def __init__(self, data: list[Any]):
+#         self.data = [Body(**x) for x in data]
+
+
 class SimulateRequest:
-    def __init__(self, data: list[Any]):
-        self.data = [Body(**x) for x in data]
+    def __init__(self, data: dict[str, Body]):
+        if len(data.keys()) != 2:
+            raise Exception(f'bad body dict length, {data}')
+
+        self.Body1: Body = Body(**data['Body1'])
+        if not self.Body1:
+            raise Exception('bad body1')
+
+        self.Body2: Body = Body(**data['Body2'])
+        if not self.Body2:
+            raise Exception('bad body2')

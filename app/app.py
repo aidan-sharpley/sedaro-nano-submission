@@ -98,13 +98,12 @@ def simulate():
 
     # payloadDict = json.loads(payload)
 
-    payload = SimulateRequest(**json_object)
-    if len(payload.data) == 0:
-        print('failed to parse due to empty request')
-        return 'bad request', 400
+    payload = SimulateRequest(json_object)
 
     print('wakka wakka')
-    print(payload.data[0].agentId)
+    print(payload.Body1.agentId)
+    print(payload.Body2)
+    print(payload)
     print(type(payload))
 
     # Create store and simulator
@@ -112,7 +111,7 @@ def simulate():
     store = QRangeStore()
     simulator = Simulator(
         store=store,
-        init=payload.data,
+        init=payload,
     )
 
     # Run simulation
