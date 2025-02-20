@@ -39,9 +39,10 @@ class Simulator:
             init.Body2.agentId: init.Body2,
         }
 
-        self.store = store
         # Time leading up to 0 has initial values for both agents.
         store[-999999999, 0] = initialUniverseDict
+
+        self.store = store
         self.init = initialUniverseDict
         self.initialSet = set(initialUniverseDict)
         self.times = {
@@ -69,6 +70,7 @@ class Simulator:
             secondaryAgentId (str): _description_
         """
         t = self.times[primaryAgentId]
+
         universe = self.read(t - DEFAULT_SIMULATION_DECR)
 
         # Check new simulated universe if
