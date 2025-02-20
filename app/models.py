@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import Any
 
 DEFAULT_TIME_VALUE = 0
 DEFAULT_TIME_STEP_VALUE = 0.01
@@ -33,5 +34,5 @@ class Body:
 
 @dataclass
 class SimulateRequest:
-    def __init__(self, data: list[Body]):
+    def __init__(self, data: list[Any]):
         self.data = [Body(**x) for x in data]
