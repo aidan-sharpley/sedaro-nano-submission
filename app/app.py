@@ -55,42 +55,6 @@ def get_data():
 
 @app.post('/simulation')
 def simulate():
-    # payload = None
-
-    # try:
-    #     json_object = request.get_json()
-    #     if not json_object:
-    #         print('failed to parse json from request')
-    #         return 'bad request', 400
-
-    #     # payloadDict = json.loads(payload)
-
-    #     payload = SimulateRequest(**json_object)
-    #     if len(payload.data) == 0:
-    #         print('failed to parse due to empty request')
-    #         return 'bad request', 400
-
-    #     print('wakka wakka')
-    #     print(payload.data[0].agentId)
-    #     print(type(payload))
-
-    # except Exception as e:
-    #     print(f'failed to parse due to unknown exception, {e}')
-    #     return 'bad request', 400
-
-    # print(req.Body1.id)
-    # data = request.get_json()  # Get the JSON data from the request
-    # user_dict = json.loads(data)  # Convert JSON to dictionary
-    # user = User(**user_dict)  # Convert dictionary to class instance
-
-    # TODO
-    # payload = request.json
-    # payload: SimulateRequest = request.json  # type: ignore
-    # if len(cast(SimulateRequest, request.json).data) == 0:
-    #     print(f'failed to parse body of request, {request}, {request.json}')
-    #     return 'Failed to parse request', 400
-    #  TODO ^^^^
-
     payload = SimulateRequest(request.get_json())
     if not payload:
         print('failed to parse json from request')
@@ -103,10 +67,8 @@ def simulate():
     print(type(payload))
 
     # Create store and simulator
-    # initial_universe = {agentId: state for agentId, state in enumerate(init)}
-    store = QRangeStore()
     simulator = Simulator(
-        store=store,
+        store=QRangeStore(),
         init=payload,
     )
 
@@ -114,18 +76,22 @@ def simulate():
     simulator.simulate()
 
     print('simmlated')
-    # print(store.store[-1][2][2].time)
-    # print(type(store.store[-1][2][2]))
-    # print(jsonpickle.dumps(store.store))
-    # print(jsonpickle.loads(jsonpickle.dumps(store.store))[-1][2])
 
     # Save data to database
-    simulation = Simulation(data=jsonpickle.dumps(store.store))
+    simulation = Simulation(data=simulator.marshalStoreContents())
+    # simulation = Simulation(data=json.dumps(store.store))
+    # storeData = json.dumps([s for s in store.store])
+    # simulation = Simulation(data=storeData)
+
+    # self.store: list[tuple[int, int, dict[str, Body]]]
+
+    # simulation = Simulation(data=store.store)
     db.session.add(simulation)
     db.session.commit()
 
-    print(store.store[-1])
-    print(store.store[-1][2]['Body2'].mass)
+    # print(store.store[-1])
+    # print(store.store[-1][2]['Body2'].mass)
 
-    return store.store
+    # return store.store
     # return jsonpickle.dumps(store.store)
+    return simulation.data

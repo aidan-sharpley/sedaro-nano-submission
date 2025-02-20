@@ -24,6 +24,7 @@ def propagate(self_state: Body, other_state: Body) -> Body:
     r_self = r_self + v_self * time_step
 
     return Body(
+        agentId=self_state.agentId,
         time=time + time_step,
         timeStep=5.0 + random() * 9.0,
         mass=self_state.mass,

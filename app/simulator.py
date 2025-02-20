@@ -1,5 +1,6 @@
 # SIMULATOR
 
+import json
 from functools import reduce
 from operator import __or__
 
@@ -39,7 +40,7 @@ class Simulator:
         }
 
         self.store = store
-        # range where value should show up
+        # Time leading up to 0 has initial values for both agents.
         store[-999999999, 0] = initialUniverseDict
         self.init = initialUniverseDict
         self.initialSet = set(initialUniverseDict)
@@ -61,6 +62,14 @@ class Simulator:
         return reduce(__or__, data, {})  # combine all data into one dictionary
 
     def simulateAgent(self, primaryAgentId: str, secondaryAgentId: str):
+        """
+        simulateAgent runs the simulation with primary and secondary agent
+        id retrieving the state for propagation calculations.
+
+        Args:
+            primaryAgentId (str): _description_
+            secondaryAgentId (str): _description_
+        """
         t = self.times[primaryAgentId]
         universe = self.read(t - DEFAULT_SIMULATION_DECR)
         print('brekky')
@@ -80,11 +89,13 @@ class Simulator:
             self.times[primaryAgentId] = newState.time
 
     def simulate(self, iterations: int = 500):
-        print('in simulacrum')
-        # print(self.init)
-        # print(self.store)
-        # print(self.times)
+        """
+        simulate runs agent 1 and then agent 2 simulation
+        for each iteration.
 
+        Args:
+            iterations (int, optional): _description_. Defaults to 500.
+        """
         # Agent order seems important, we go 1 and then 2.
         for _ in range(iterations):
             self.simulateAgent(
@@ -95,35 +106,6 @@ class Simulator:
                 primaryAgentId=self.secondaryAgentIdx,
                 secondaryAgentId=self.primaryAgentIdx,
             )
-            # for agentId in self.init:
-            # t = self.times[agentId]
-            # universe = self.read(t - DEFAULT_SIMULATION_DECR)
-            # print('brekky')
-            # print(universe)
-            # print(agentId)
-            # print(t)
-            # # Check new simulated universe if
-            # # it is back to initial state.
-            # if set(universe) == self.initialSet:
-            #     print('we are equal ')
-            #     newState = propagate(agentId, universe)
-            #     print(newState)
-            #     self.store[t, newState.time] = {agentId: newState}
-            #     self.times[agentId] = newState.time
 
-            # TODO parallel?
-            # for agentId in self.init:
-            #     t = self.times[agentId]
-            #     universe = self.read(t - DEFAULT_SIMULATION_DECR)
-            #     print('brekky')
-            #     print(universe)
-            #     print(agentId)
-            #     print(t)
-            #     # Check new simulated universe if
-            #     # it is back to initial state.
-            #     if set(universe) == self.initialSet:
-            #         print('we are equal ')
-            #         newState = propagate(agentId, universe)
-            #         print(newState)
-            #         self.store[t, newState.time] = {agentId: newState}
-            #         self.times[agentId] = newState.time
+    def marshalStoreContents(self) -> str:
+        return json.dumps(self.store.marshalStore)

@@ -1,6 +1,7 @@
 # DATA STRUCTURE
 
 import doctest
+from dataclasses import asdict
 
 from models import Body
 
@@ -37,9 +38,10 @@ class QRangeStore:
     """
 
     def __init__(self):
-        self.store: list[tuple[int, int, dict[str, Body]]] = []
+        self.store: list[tuple[int | float, int | float, dict[str, Body]]] = []
+        self.marshalStore: list[str] = []
 
-    def __setitem__(self, rng, value):
+    def __setitem__(self, rng: tuple[float, float], value: dict[str, Body]):
         try:
             (low, high) = rng
         except (TypeError, ValueError):
@@ -47,6 +49,17 @@ class QRangeStore:
         if not low < high:
             raise IndexError('Invalid Range.')
         self.store.append((low, high, value))
+        print('say what')
+        print({k: str(v) for k, v in value.items()})
+        print(value.items())
+        # print(value)
+        # print(json.dumps(value))
+        # print(json.dumps(((low, high, {k: asdict(v) for k, v in value.items()}))))
+        self.marshalStore.append(
+            ((low, high, {k: asdict(v) for k, v in value.items()}))
+        )
+        print('hmmm')
+        print(self.marshalStore[-1])
 
     def __getitem__(self, key: int | float):
         ret = [v for (low, high, v) in self.store if low <= key < high]
