@@ -4,6 +4,7 @@
 from threading import Thread
 
 from flask import Flask, request
+from flask_compress import Compress
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
@@ -21,6 +22,9 @@ class Base(DeclarativeBase):
 
 app = Flask(__name__)
 CORS(app, origins=['http://localhost:3030'])
+
+compress = Compress()
+compress.init_app(app)
 
 db = SQLAlchemy(model_class=Base)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
@@ -51,7 +55,9 @@ def health():
 def get_data():
     # Get most recent simulation from database
     simulation: Simulation = Simulation.query.order_by(Simulation.id.desc()).first()
-    return simulation.data if simulation else []
+    return app.response_class(
+        response=simulation.data if simulation else [], mimetype='application/json'
+    )
 
 
 @app.post('/simulation')
@@ -73,7 +79,7 @@ def simulate():
     # Don't hold up response with commit to DB
     Thread(target=session_commit, args=(Simulation(data=simulation_data),)).start()
 
-    return simulation_data
+    return app.response_class(response=simulation_data, mimetype='application/json')
 
 
 def session_commit(simulation: Simulation):

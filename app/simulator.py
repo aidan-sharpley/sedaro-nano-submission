@@ -57,13 +57,8 @@ class Simulator:
         if t < 0:
             return self.init
 
-        try:
-            data = self.store[t]
-        except IndexError:
-            data = []
-
         # Roll up results and set the most recent data for all agents at time in store.
-        return reduce(__or__, data, {})  # combine all data into one dictionary
+        return reduce(__or__, self.store[t], {})  # combine all data into one dictionary
 
     def simulate_agent(self, primary_agent_id: str, secondary_agent_id: str):
         """
