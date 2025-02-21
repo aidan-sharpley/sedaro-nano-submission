@@ -40,6 +40,8 @@ class Simulator:
             init.Body2.agentId: init.Body2,
         }
 
+        store[-999999999, 0] = initialUniverseDict
+
         self.store = store
         self.init = initialUniverseDict
         self.agentList = set(initialUniverseDict.keys())
@@ -60,6 +62,8 @@ class Simulator:
             data = self.store[t]
         except IndexError:
             data = []
+
+        # Roll up results and set the most recent data for all agents at time in store.
         return reduce(__or__, data, {})  # combine all data into one dictionary
 
     def simulateAgent(self, primaryAgentId: str, secondaryAgentId: str):
@@ -74,12 +78,19 @@ class Simulator:
         t = self.times[primaryAgentId]
         decrementedTime = t - DEFAULT_SIMULATION_DECR
 
+        # Check state of agents at less time.
+        # Continue to loop until we reach a time that falls within
+        # all agent time ranges and gets all latest values.
         universe = self.read(decrementedTime)
 
         # Check combined universe of agents at time.
+        # Don't even bother with the set if length doesn't match.
         # Don't propagate until all agents initially found
         # in simulation request are present and have caught up.
-        if set(universe.keys()) == self.agentList:
+        if (
+            len(universe) == len(self.agentList)
+            and set(universe.keys()) == self.agentList
+        ):
             newState = propagate(
                 self_state=universe[primaryAgentId],
                 other_state=universe[secondaryAgentId],
