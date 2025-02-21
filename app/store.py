@@ -51,7 +51,9 @@ class QRangeStore:
         self.store.append((low, high, value))
 
     def __getitem__(self, key: int | float):
-        ret = [v for (low, high, v) in self.store if low <= key < high]
+        # Reverse the store because we know that the key is ascending in value
+        # so we will find our values faster.
+        ret = [v for (low, high, v) in self.store[::-1] if low <= key < high]
         if not ret:
             raise IndexError('Not found.')
         return ret

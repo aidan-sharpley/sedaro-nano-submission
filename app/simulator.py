@@ -44,7 +44,6 @@ class Simulator:
 
         self.store = store
         self.init = initialUniverseDict
-        self.agentList = set(initialUniverseDict.keys())
         self.times = {
             init.Body1.agentId: init.Body1.time,
             init.Body2.agentId: init.Body2.time,
@@ -78,25 +77,23 @@ class Simulator:
         t = self.times[primaryAgentId]
         decrementedTime = t - DEFAULT_SIMULATION_DECR
 
-        # Check state of agents at less time.
+        # If the second body is not caught up in the time series
+        # we need to propagate the secondary before we can move
+        # the primary.
+        if self.times[secondaryAgentId] <= decrementedTime:
+            return
+
+        # See if bodies are caught up at point in time.
         # Continue to loop until we reach a time that falls within
         # all agent time ranges and gets all latest values.
         universe = self.read(decrementedTime)
 
-        # Check combined universe of agents at time.
-        # Don't even bother with the set if length doesn't match.
-        # Don't propagate until all agents initially found
-        # in simulation request are present and have caught up.
-        if (
-            len(universe) == len(self.agentList)
-            and set(universe.keys()) == self.agentList
-        ):
-            newState = propagate(
-                self_state=universe[primaryAgentId],
-                other_state=universe[secondaryAgentId],
-            )
-            self.store[t, newState.time] = {primaryAgentId: newState}
-            self.times[primaryAgentId] = newState.time
+        newState = propagate(
+            self_state=universe[primaryAgentId],
+            other_state=universe[secondaryAgentId],
+        )
+        self.store[t, newState.time] = {primaryAgentId: newState}
+        self.times[primaryAgentId] = newState.time
 
     def simulate(self, iterations: int = 500):
         """
@@ -115,6 +112,8 @@ class Simulator:
                 primaryAgentId=self.secondaryAgentIdx,
                 secondaryAgentId=self.primaryAgentIdx,
             )
+
+        return self.marshalStoreContents()
 
     def marshalStoreContents(self) -> str:
         # Need to marshal the nested Body classes.
