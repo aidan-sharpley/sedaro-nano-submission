@@ -1,6 +1,8 @@
 # HTTP SERVER
 
 
+from threading import Thread
+
 from flask import Flask, request
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
@@ -66,12 +68,15 @@ def simulate():
     )
 
     # Run simulation
-    simulator.simulate()
+    simulationData = simulator.simulate()
 
-    # Save data to database
-    simulation = Simulation(data=simulator.marshalStoreContents())
+    # Don't hold up response with commit to DB
+    Thread(target=sessionCommit, args=(Simulation(data=simulationData),)).start()
 
-    db.session.add(simulation)
-    db.session.commit()
+    return simulationData
 
-    return simulation.data
+
+def sessionCommit(simulation: Simulation):
+    with app.app_context():
+        db.session.add(simulation)
+        db.session.commit()

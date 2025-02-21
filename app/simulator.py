@@ -1,6 +1,7 @@
 # SIMULATOR
 
 import json
+from dataclasses import asdict
 from functools import reduce
 from operator import __or__
 
@@ -39,11 +40,10 @@ class Simulator:
             init.Body2.agentId: init.Body2,
         }
 
-        self.store = store
-        # Time leading up to 0 has initial values for both agents.
         store[-999999999, 0] = initialUniverseDict
+
+        self.store = store
         self.init = initialUniverseDict
-        self.initialSet = set(initialUniverseDict)
         self.times = {
             init.Body1.agentId: init.Body1.time,
             init.Body2.agentId: init.Body2.time,
@@ -53,10 +53,16 @@ class Simulator:
         self.secondaryAgentIdx = init.Body2.agentId
 
     def read(self, t: float) -> dict[str, Body]:
+        # Short circuit default value setting for store in original code.
+        if t < 0:
+            return self.init
+
         try:
             data = self.store[t]
         except IndexError:
             data = []
+
+        # Roll up results and set the most recent data for all agents at time in store.
         return reduce(__or__, data, {})  # combine all data into one dictionary
 
     def simulateAgent(self, primaryAgentId: str, secondaryAgentId: str):
@@ -69,17 +75,25 @@ class Simulator:
             secondaryAgentId (str): _description_
         """
         t = self.times[primaryAgentId]
-        universe = self.read(t - DEFAULT_SIMULATION_DECR)
+        decrementedTime = t - DEFAULT_SIMULATION_DECR
 
-        # Check new simulated universe if
-        # it is back to initial state.
-        if set(universe) == self.initialSet:
-            newState = propagate(
-                self_state=universe[primaryAgentId],
-                other_state=universe[secondaryAgentId],
-            )
-            self.store[t, newState.time] = {primaryAgentId: newState}
-            self.times[primaryAgentId] = newState.time
+        # If the second body is not caught up in the time series
+        # we need to propagate the secondary before we can move
+        # the primary.
+        if self.times[secondaryAgentId] <= decrementedTime:
+            return
+
+        # See if bodies are caught up at point in time.
+        # Continue to loop until we reach a time that falls within
+        # all agent time ranges and gets all latest values.
+        universe = self.read(decrementedTime)
+
+        newState = propagate(
+            self_state=universe[primaryAgentId],
+            other_state=universe[secondaryAgentId],
+        )
+        self.store[t, newState.time] = {primaryAgentId: newState}
+        self.times[primaryAgentId] = newState.time
 
     def simulate(self, iterations: int = 500):
         """
@@ -89,7 +103,6 @@ class Simulator:
         Args:
             iterations (int, optional): _description_. Defaults to 500.
         """
-        # Agent order seems important, we go 1 and then 2.
         for _ in range(iterations):
             self.simulateAgent(
                 primaryAgentId=self.primaryAgentIdx,
@@ -100,5 +113,13 @@ class Simulator:
                 secondaryAgentId=self.primaryAgentIdx,
             )
 
+        return self.marshalStoreContents()
+
     def marshalStoreContents(self) -> str:
-        return json.dumps(self.store.marshalStore)
+        # Need to marshal the nested Body classes.
+        return json.dumps(
+            [
+                (low, high, {k: asdict(v) for k, v in val.items()})
+                for (low, high, val) in self.store.store
+            ]
+        )
