@@ -68,15 +68,15 @@ def simulate():
     )
 
     # Run simulation
-    simulationData = simulator.simulate()
+    simulation_data = simulator.simulate()
 
     # Don't hold up response with commit to DB
-    Thread(target=sessionCommit, args=(Simulation(data=simulationData),)).start()
+    Thread(target=session_commit, args=(Simulation(data=simulation_data),)).start()
 
-    return simulationData
+    return simulation_data
 
 
-def sessionCommit(simulation: Simulation):
+def session_commit(simulation: Simulation):
     with app.app_context():
         db.session.add(simulation)
         db.session.commit()
