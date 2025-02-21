@@ -51,6 +51,9 @@ class QRangeStore:
         self.store.append((low, high, value))
 
     def __getitem__(self, key: int | float):
+        # We decrement time when reading from the store
+        # in order to eventually find all the agents.
+        # We should start from the end.
         ret = [v for (low, high, v) in self.store if low <= key < high]
         if not ret:
             raise IndexError('Not found.')
