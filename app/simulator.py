@@ -1,6 +1,7 @@
 # SIMULATOR
 
 import json
+from dataclasses import asdict
 from functools import reduce
 from operator import __or__
 
@@ -39,12 +40,9 @@ class Simulator:
             init.Body2.agentId: init.Body2,
         }
 
-        # Time leading up to 0 has initial values for both agents.
-        store[-999999999, 0] = initialUniverseDict
-
         self.store = store
         self.init = initialUniverseDict
-        self.initialSet = set(initialUniverseDict)
+        self.agentList = set(initialUniverseDict.keys())
         self.times = {
             init.Body1.agentId: init.Body1.time,
             init.Body2.agentId: init.Body2.time,
@@ -54,6 +52,10 @@ class Simulator:
         self.secondaryAgentIdx = init.Body2.agentId
 
     def read(self, t: float) -> dict[str, Body]:
+        # Short circuit default value setting for store in original code.
+        if t < 0:
+            return self.init
+
         try:
             data = self.store[t]
         except IndexError:
@@ -70,12 +72,14 @@ class Simulator:
             secondaryAgentId (str): _description_
         """
         t = self.times[primaryAgentId]
+        decrementedTime = t - DEFAULT_SIMULATION_DECR
 
-        universe = self.read(t - DEFAULT_SIMULATION_DECR)
+        universe = self.read(decrementedTime)
 
-        # Check new simulated universe if
-        # it is back to initial state.
-        if set(universe) == self.initialSet:
+        # Check combined universe of agents at time.
+        # Don't propagate until all agents initially found
+        # in simulation request are present and have caught up.
+        if set(universe.keys()) == self.agentList:
             newState = propagate(
                 self_state=universe[primaryAgentId],
                 other_state=universe[secondaryAgentId],
@@ -91,7 +95,6 @@ class Simulator:
         Args:
             iterations (int, optional): _description_. Defaults to 500.
         """
-        # Agent order seems important, we go 1 and then 2.
         for _ in range(iterations):
             self.simulateAgent(
                 primaryAgentId=self.primaryAgentIdx,
@@ -103,4 +106,10 @@ class Simulator:
             )
 
     def marshalStoreContents(self) -> str:
-        return json.dumps(self.store.marshalStore)
+        # Need to marshal the nested Body classes.
+        return json.dumps(
+            [
+                (low, high, {k: asdict(v) for k, v in val.items()})
+                for (low, high, val) in self.store.store
+            ]
+        )
