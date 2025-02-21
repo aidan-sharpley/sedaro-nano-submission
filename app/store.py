@@ -51,12 +51,13 @@ class QRangeStore:
         self.store.append((low, high, value))
 
     def __getitem__(self, key: int | float):
-        # Reverse the store because we know that the key is ascending in value
-        # so we will find our values faster.
-        ret = [v for (low, high, v) in self.store[::-1] if low <= key < high]
-        if not ret:
-            raise IndexError('Not found.')
-        return ret
+        return list(self.store_search_generator(key))
+
+    def store_search_generator(self, key: int | float):
+        # Reverse the store because we know that the key is ascending in value as the simulation progresses (time), so we may find our values faster.
+        for low, high, v in reversed(self.store):
+            if high > key >= low:
+                yield v
 
 
 doctest.testmod()

@@ -21,7 +21,7 @@ class Body:
 class SimulateRequest:
     def __init__(self, data: dict[str, Body]):
         if len(data.keys()) != 2:
-            raise Exception(f'bad body dict length, {data}')
+            raise Exception(f'missing body(s), {data}')
 
         self.Body1: Body = Body(**data['Body1'])
         if not self.Body1:

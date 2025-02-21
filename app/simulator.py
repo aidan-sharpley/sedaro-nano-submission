@@ -31,7 +31,7 @@ class Simulator:
 
     Args:
         store (QRangeStore): The data store in which to save the simulation results.
-        init (list[Body]): The initial state of the universe.
+        init (SimulateRequest): The initial state of the universe.
     """
 
     def __init__(self, store: QRangeStore, init: SimulateRequest):
@@ -57,43 +57,36 @@ class Simulator:
         if t < 0:
             return self.init
 
-        try:
-            data = self.store[t]
-        except IndexError:
-            data = []
-
         # Roll up results and set the most recent data for all agents at time in store.
-        return reduce(__or__, data, {})  # combine all data into one dictionary
+        return reduce(__or__, self.store[t], {})  # combine all data into one dictionary
 
-    def simulateAgent(self, primaryAgentId: str, secondaryAgentId: str):
+    def simulate_agent(self, primary_agent_id: str, secondary_agent_id: str):
         """
         simulateAgent runs the simulation with primary and secondary agent
         id retrieving the state for propagation calculations.
 
         Args:
-            primaryAgentId (str): _description_
-            secondaryAgentId (str): _description_
+            primary_agent_id (str): _description_
+            secondary_agent_id (str): _description_
         """
-        t = self.times[primaryAgentId]
-        decrementedTime = t - DEFAULT_SIMULATION_DECR
+        t = self.times[primary_agent_id]
+        decremented_time = t - DEFAULT_SIMULATION_DECR
 
-        # If the second body is not caught up in the time series
+        # If the second body is not "caught up" in the time series
         # we need to propagate the secondary before we can move
         # the primary.
-        if self.times[secondaryAgentId] <= decrementedTime:
+        if self.times[secondary_agent_id] <= decremented_time:
             return
 
-        # See if bodies are caught up at point in time.
-        # Continue to loop until we reach a time that falls within
-        # all agent time ranges and gets all latest values.
-        universe = self.read(decrementedTime)
+        # See if bodies have both propagated to reach this point in time.
+        universe = self.read(decremented_time)
 
-        newState = propagate(
-            self_state=universe[primaryAgentId],
-            other_state=universe[secondaryAgentId],
+        new_state = propagate(
+            self_state=universe[primary_agent_id],
+            other_state=universe[secondary_agent_id],
         )
-        self.store[t, newState.time] = {primaryAgentId: newState}
-        self.times[primaryAgentId] = newState.time
+        self.store[t, new_state.time] = {primary_agent_id: new_state}
+        self.times[primary_agent_id] = new_state.time
 
     def simulate(self, iterations: int = 500):
         """
@@ -104,18 +97,18 @@ class Simulator:
             iterations (int, optional): _description_. Defaults to 500.
         """
         for _ in range(iterations):
-            self.simulateAgent(
-                primaryAgentId=self.primaryAgentIdx,
-                secondaryAgentId=self.secondaryAgentIdx,
+            self.simulate_agent(
+                primary_agent_id=self.primaryAgentIdx,
+                secondary_agent_id=self.secondaryAgentIdx,
             )
-            self.simulateAgent(
-                primaryAgentId=self.secondaryAgentIdx,
-                secondaryAgentId=self.primaryAgentIdx,
+            self.simulate_agent(
+                primary_agent_id=self.secondaryAgentIdx,
+                secondary_agent_id=self.primaryAgentIdx,
             )
 
-        return self.marshalStoreContents()
+        return self.marshal_store_contents()
 
-    def marshalStoreContents(self) -> str:
+    def marshal_store_contents(self) -> str:
         # Need to marshal the nested Body classes.
         return json.dumps(
             [
