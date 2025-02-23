@@ -5,13 +5,16 @@ import {
 	Flex,
 	Heading,
 	Separator,
+	Table,
 	TextField,
+	Tooltip,
 } from '@radix-ui/themes';
 import _ from 'lodash';
 import React, { useCallback, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Routes } from 'routes';
 import { FormValue, defaultBody1, defaultBody2 } from 'types';
+import Input from './Input';
 
 type BaseCardProps = {
 	formData: FormData;
@@ -31,73 +34,53 @@ function BaseCard({
 			<Heading as="h3" size="3" weight="bold">
 				{title}
 			</Heading>
-			{/* Form: https://www.radix-ui.com/primitives/docs/components/form */}
-			<FormField name={`${title}.x`}>
-				<FormLabel htmlFor={`${title}.x`}>Initial X-position</FormLabel>
-				<TextField.Root
-					type="number"
-					id={`${title}.x`}
-					name={`${title}.x`}
-					value={formData[title]?.x}
-					onChange={handleChange}
-					required={required}
-				/>
-			</FormField>
-			<FormField name={`${title}.y`}>
-				<FormLabel htmlFor={`${title}.y`}>Initial Y-position</FormLabel>
-				<TextField.Root
-					type="number"
-					id={`${title}.y`}
-					name={`${title}.y`}
-					value={formData[title]?.y}
-					onChange={handleChange}
-					required={required}
-				/>
-			</FormField>
-			<FormField name={`${title}.z`}>
-				<FormLabel htmlFor={`${title}.z`}>Initial Z-position</FormLabel>
-				<TextField.Root
-					type="number"
-					id={`${title}.z`}
-					name={`${title}.z`}
-					value={formData[title]?.z}
-					onChange={handleChange}
-					required={required}
-				/>
-			</FormField>
-			<FormField name={`${title}.vx`}>
-				<FormLabel htmlFor={`${title}.vx`}>Initial X-velocity</FormLabel>
-				<TextField.Root
-					type="number"
-					id={`${title}.vx`}
-					name={`${title}.vx`}
-					value={formData[title]?.vx}
-					onChange={handleChange}
-					required={required}
-				/>
-			</FormField>
-			<FormField name={`${title}.vy`}>
-				<FormLabel htmlFor={`${title}.vy`}>Initial Y-velocity</FormLabel>
-				<TextField.Root
-					type="number"
-					id={`${title}.vy`}
-					name={`${title}.vy`}
-					value={formData[title]?.vy}
-					onChange={handleChange}
-					required={required}
-				/>
-			</FormField>
-			<FormField name={`${title}.vz`}>
-				<FormLabel htmlFor={`${title}.vz`}>Initial Z-velocity</FormLabel>
-				<TextField.Root
-					type="number"
-					id={title}
-					name={title}
-					value={formData[title]?.vz}
-					onChange={handleChange}
-					required={required}
-				/>
-			</FormField>
+			<Flex justify="center" width="100%" m="4">
+				<Table.Root
+					style={{
+						width: '800px',
+					}}
+				>
+					{/* Table: https://www.radix-ui.com/themes/docs/components/table */}
+					<Table.Header>
+						<Table.Row>
+							<Table.ColumnHeaderCell></Table.ColumnHeaderCell>
+							<Tooltip content={'Initial X-position'}>
+								<Table.ColumnHeaderCell>X</Table.ColumnHeaderCell>
+							</Tooltip>
+							<Tooltip content={'Initial Y-position'}>
+								<Table.ColumnHeaderCell>Y</Table.ColumnHeaderCell>
+							</Tooltip>
+							<Tooltip content={'Initial Z-position'}>
+								<Table.ColumnHeaderCell>Z</Table.ColumnHeaderCell>
+							</Tooltip>
+						</Table.Row>
+					</Table.Header>
+					<Table.Body>
+						<Table.Row key={'position-key'}>
+							<Table.RowHeaderCell>{'Position'}</Table.RowHeaderCell>
+							<Input
+								key={'x'}
+								formData={formData}
+								handleChange={handleChange}
+								title={title}
+							/>
+							<Input
+								key={'y'}
+								formData={formData}
+								handleChange={handleChange}
+								title={title}
+							/>
+							<Input
+								key={'z'}
+								formData={formData}
+								handleChange={handleChange}
+								title={title}
+							/>
+						</Table.Row>
+					</Table.Body>
+				</Table.Root>
+			</Flex>
+
 			<FormField name={`${title}.mass`}>
 				<FormLabel htmlFor={`${title}.mass`}>Mass</FormLabel>
 				<TextField.Root
