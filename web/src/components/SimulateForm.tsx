@@ -14,7 +14,7 @@ const SimulateForm = ({ style, width }: SimulateFormProps) => {
 	const [formData, setFormData] = useState<FormData>({
 		Body1: defaultBody1,
 		Body2: defaultBody2,
-		Batch: {},
+		Batch: {} as Body,
 	});
 
 	const handleSubmit = useCallback(
@@ -41,29 +41,32 @@ const SimulateForm = ({ style, width }: SimulateFormProps) => {
 	return (
 		<Flex>
 			{/* Card: https://www.radix-ui.com/themes/docs/components/card */}
-			<Card style={{ background: 'black', ...style }}>
+			<Card size={'4'} style={{ background: 'black', ...style }}>
 				<Form onSubmit={handleSubmit}>
-					<Flex my={'2'} direction={'column'}>
-						<BaseCard
-							title="Body1"
-							formData={formData}
-							setFormData={setFormData}
-						/>
-						<Separator size="4" my="3" />
-						<BaseCard
-							title="Body2"
-							formData={formData}
-							setFormData={setFormData}
-						/>
-						<Separator size="4" my="3" />
-						<BaseCard
-							title="Batch"
-							formData={formData}
-							setFormData={setFormData}
-							required={false}
-						/>
-						<Separator size="4" my="3" />
-						<Flex justify="center">
+					<Flex direction={'column'}>
+						<Flex justify="center" mt="-3">
+							<BaseCard
+								title="Body1"
+								formData={formData}
+								setFormData={setFormData}
+							/>
+						</Flex>
+						<Flex justify="center" mt="5">
+							<BaseCard
+								title="Body2"
+								formData={formData}
+								setFormData={setFormData}
+							/>
+						</Flex>
+						<Flex justify="center" mt="5">
+							<BaseCard
+								title="Batch"
+								formData={formData}
+								setFormData={setFormData}
+								required={false}
+							/>
+						</Flex>
+						<Flex justify="center" mt="5">
 							<Button type="submit">Submit</Button>
 						</Flex>
 					</Flex>

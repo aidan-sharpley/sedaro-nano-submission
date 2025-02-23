@@ -21,7 +21,7 @@ function BaseCard({
 }: BaseCardProps) {
 	return (
 		<Flex justify="center" m="3">
-			<Table.Root m={'-4'} size={'1'} my="-5">
+			<Table.Root m={'-7'} size={'1'} my="-5">
 				{/* Table: https://www.radix-ui.com/themes/docs/components/table */}
 				<Table.Header>
 					<Table.Row>

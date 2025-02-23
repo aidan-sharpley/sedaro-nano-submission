@@ -21,12 +21,7 @@ const root = ReactDOM.createRoot(document.getElementById('root')!);
 root.render(
 	<React.StrictMode>
 		{/* Theme: https://www.radix-ui.com/themes/docs/theme/overview */}
-		<Theme
-			appearance="dark"
-			accentColor="iris"
-			grayColor="mauve"
-			radius="small"
-		>
+		<Theme accentColor="iris" grayColor="mauve" radius="full">
 			<RouterProvider router={router} />
 		</Theme>
 	</React.StrictMode>
