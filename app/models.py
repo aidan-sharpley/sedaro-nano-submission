@@ -6,21 +6,21 @@ DEFAULT_TIME_STEP_VALUE = 0.01
 
 @dataclass
 class Body:
-    agentId: str
-    x: float
-    y: float
-    z: float
-    vx: float
-    vy: float
-    vz: float
-    mass: float
+    agentId: str = ''
+    x: float = 0
+    y: float = 0
+    z: float = 0
+    vx: float = 0
+    vy: float = 0
+    vz: float = 0
+    mass: float = 0
     time: float = DEFAULT_TIME_VALUE
     timeStep: float = DEFAULT_TIME_STEP_VALUE
 
 
 class SimulateRequest:
     def __init__(self, data: dict[str, Body]):
-        if len(data.keys()) != 2:
+        if len(data.keys()) != 3:
             raise Exception(f'missing body(s), {data}')
 
         self.Body1: Body = Body(**data['Body1'])
@@ -30,3 +30,7 @@ class SimulateRequest:
         self.Body2: Body = Body(**data['Body2'])
         if not self.Body2:
             raise Exception('bad body2')
+
+        self.Batch: Body = Body(**data['Batch'])
+        if not self.Batch:
+            raise Exception('bad batch')
