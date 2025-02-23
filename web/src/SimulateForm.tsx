@@ -12,7 +12,7 @@ import _ from 'lodash';
 import React, { useCallback, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Routes } from 'routes';
-import { FormValue, defaultBody1, defaultBody2 } from 'types';
+import { FormValue, defaultBody1, defaultBody2, Body } from 'types';
 
 type SimRequest<FormData> = {
 	Body1: Body;
@@ -30,12 +30,6 @@ const SimulateForm: React.FC = () => {
 		Body2: defaultBody2,
 		Batch: {},
 	});
-
-	const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-		const { name, value } = e.target;
-		let newValue: FormValue = value === '' ? '' : parseFloat(value);
-		setFormData((prev) => _.set({ ...prev }, name, newValue));
-	}, []);
 
 	const handleSubmit = useCallback(
 		async (e: React.FormEvent) => {
@@ -58,6 +52,12 @@ const SimulateForm: React.FC = () => {
 		},
 		[formData]
 	);
+
+	const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+		const { name, value } = e.target;
+		let newValue: FormValue = value === '' ? '' : parseFloat(value);
+		setFormData((prev) => _.set({ ...prev }, name, newValue));
+	}, []);
 
 	return (
 		<div
@@ -85,17 +85,20 @@ const SimulateForm: React.FC = () => {
 						formData={formData}
 						handleChange={handleChange}
 					/>
+					<Separator size="4" my="5" />
 					<BaseCard
 						title="Body2"
 						formData={formData}
-						handleChange={handleChange}
+						setFormData={setFormData}
 					/>
+					<Separator size="4" my="5" />
 					<BaseCard
 						title="Batch"
 						formData={formData}
-						handleChange={handleChange}
+						setFormData={setFormData}
 						required={false}
 					/>
+					<Separator size="4" my="5" />
 					<Flex justify="center" m="5">
 						<Button type="submit">Submit</Button>
 					</Flex>

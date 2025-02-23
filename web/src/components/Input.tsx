@@ -1,33 +1,39 @@
 import { FormField } from '@radix-ui/react-form';
 import { Table, TextField } from '@radix-ui/themes';
 import _ from 'lodash';
-import React from 'react';
+import React, { useCallback } from 'react';
+import { FormValue } from 'types';
 
 type InputProps = {
 	formData: FormData;
-	handleChange: React.ChangeEventHandler<HTMLInputElement>;
 	title: string;
 	required?: boolean;
-	key: string;
+	field: string;
+	value?: number;
+	setFormData: (value: React.SetStateAction<FormData>) => void;
 };
 
 function Input({
 	title,
-	formData,
-	handleChange,
 	required = true,
-	key,
+	field,
+	formData,
+	setFormData,
 }: InputProps) {
 	return (
 		<>
 			<Table.Cell>
-				<FormField name={`${title}.${key}`}>
+				<FormField name={`${title}.${field ?? ''}`}>
 					<TextField.Root
 						type="number"
-						id={`${title}.${key}`}
-						name={`${title}.${key}`}
-						value={formData[title][key]}
-						onChange={handleChange}
+						id={`${title}.${field ?? ''}`}
+						name={`${title}.${field ?? ''}`}
+						value={formData?.[title]?.[field]}
+						onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+							const { name, value } = e.target;
+							let newValue: FormValue = value === '' ? '' : parseFloat(value);
+							setFormData((prev) => _.set({ ...prev }, name, newValue));
+						}}
 						required={required}
 						step={0.01}
 					/>

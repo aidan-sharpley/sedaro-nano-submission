@@ -1,33 +1,22 @@
-import { Form, FormField, FormLabel } from '@radix-ui/react-form';
-import {
-	Button,
-	Card,
-	Flex,
-	Heading,
-	Separator,
-	Table,
-	TextField,
-	Tooltip,
-} from '@radix-ui/themes';
+import { Flex, Heading, Table, Tooltip } from '@radix-ui/themes';
 import _ from 'lodash';
-import React, { useCallback, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Routes } from 'routes';
-import { FormValue, defaultBody1, defaultBody2 } from 'types';
+import React from 'react';
 import Input from './Input';
 
 type BaseCardProps = {
 	formData: FormData;
-	handleChange: React.ChangeEventHandler<HTMLInputElement>;
+	setFormData: React.Dispatch<React.SetStateAction<FormData>>;
 	title: string;
 	required?: boolean;
+	onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
 function BaseCard({
 	title,
 	formData,
-	handleChange,
+	setFormData,
 	required = true,
+	onChange,
 }: BaseCardProps) {
 	return (
 		<>
@@ -59,39 +48,64 @@ function BaseCard({
 						<Table.Row key={'position-key'}>
 							<Table.RowHeaderCell>{'Position'}</Table.RowHeaderCell>
 							<Input
-								key={'x'}
+								field={'x'}
 								formData={formData}
-								handleChange={handleChange}
+								setFormData={setFormData}
 								title={title}
+								required={required}
 							/>
 							<Input
-								key={'y'}
+								field={'y'}
 								formData={formData}
-								handleChange={handleChange}
+								setFormData={setFormData}
 								title={title}
+								required={required}
 							/>
 							<Input
-								key={'z'}
+								field={'z'}
 								formData={formData}
-								handleChange={handleChange}
+								setFormData={setFormData}
 								title={title}
+								required={required}
+							/>
+						</Table.Row>
+						<Table.Row key={'velocity-key'}>
+							<Table.RowHeaderCell>{'Velocity'}</Table.RowHeaderCell>
+							<Input
+								field={'vx'}
+								formData={formData}
+								setFormData={setFormData}
+								title={title}
+								required={required}
+							/>
+							<Input
+								field={'vy'}
+								formData={formData}
+								setFormData={setFormData}
+								title={title}
+								required={required}
+							/>
+							<Input
+								field={'vz'}
+								formData={formData}
+								setFormData={setFormData}
+								title={title}
+								required={required}
+							/>
+						</Table.Row>
+						<Table.Row key={'mass-key'}>
+							<Table.RowHeaderCell>{'Mass'}</Table.RowHeaderCell>
+							<Input
+								field={'mass'}
+								formData={formData}
+								setFormData={setFormData}
+								title={title}
+								required={required}
 							/>
 						</Table.Row>
 					</Table.Body>
 				</Table.Root>
 			</Flex>
-
-			<FormField name={`${title}.mass`}>
-				<FormLabel htmlFor={`${title}.mass`}>Mass</FormLabel>
-				<TextField.Root
-					type="number"
-					id={`${title}.mass`}
-					name={`${title}.mass`}
-					value={formData[title]?.mass}
-					onChange={handleChange}
-					required={required}
-				/>
-			</FormField>
 		</>
 	);
 }
