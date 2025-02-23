@@ -114,7 +114,7 @@ const App = () => {
 							zaxis: { title: 'Z' },
 						},
 						autosize: true,
-						dragmode: 'turntable',
+						dragmode: 'orbit',
 					}}
 					useResizeHandler
 					config={{
