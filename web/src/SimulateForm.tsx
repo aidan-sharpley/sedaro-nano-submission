@@ -41,7 +41,7 @@ const SimulateForm = ({ style, width }: SimulateFormProps) => {
 	return (
 		<Flex>
 			{/* Card: https://www.radix-ui.com/themes/docs/components/card */}
-			<Card style={style}>
+			<Card style={{ background: 'black', ...style }}>
 				<Form onSubmit={handleSubmit}>
 					<BaseCard
 						title="Body1"

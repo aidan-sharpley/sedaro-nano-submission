@@ -88,82 +88,41 @@ const App = () => {
 			}}
 		>
 			{/* Flex: https://www.radix-ui.com/themes/docs/components/flex */}
-			<Flex direction="column" width="100%" justify="center" align="center">
-				<Flex direction="row" justify="center">
-					<Flex ml={'8'} mr={'3'} align={'center'}>
-						<SimulateForm
-							style={{
-								position: 'absolute',
-								width: '60vh',
-								// height: '100%',
-								height: '80vh',
-								zIndex: '10',
-								background: 'black',
-							}}
-						/>
-					</Flex>
-					<Plot
-						style={{
-							width: '100%',
-							height: '100%',
-							// position: 'relative',
-							position: 'absolute',
-							// zIndex: '-1',
-						}}
-						data={[...positionData, ...velocityData]}
-						layout={{
-							title: 'Position & Velocity',
-							scene: {
-								xaxis: { title: 'X' },
-								yaxis: { title: 'Y' },
-								zaxis: { title: 'Z' },
-							},
-							autosize: true,
-							dragmode: 'turntable',
-						}}
-						useResizeHandler
-						config={{
-							scrollZoom: true,
-						}}
-					/>
-
-					{/* <Plot
-						style={{ width: '45%', height: '100%', margin: '5px' }}
-						data={positionData}
-						layout={{
-							title: 'Position',
-							scene: {
-								xaxis: { title: 'X' },
-								yaxis: { title: 'Y' },
-								zaxis: { title: 'Z' },
-							},
-							autosize: true,
-							dragmode: 'turntable',
-						}}
-						useResizeHandler
-						config={{
-							scrollZoom: true,
-						}}
-					/>
-					<Plot
-						style={{ width: '45%', height: '100%', margin: '5px' }}
-						data={velocityData}
-						layout={{
-							title: 'Velocity',
-							scene: {
-								xaxis: { title: 'X' },
-								yaxis: { title: 'Y' },
-								zaxis: { title: 'Z' },
-							},
-							autosize: true,
-							dragmode: 'turntable',
-						}}
-						useResizeHandler
-						config={{
-							scrollZoom: true,
-						}}
-					/> */}
-				</Flex>
+			<Flex
+				position={'absolute'}
+				ml={'1vh'}
+				mt={'5vh'}
+				height={'80vh'}
+				width={'50vh'}
+			>
+				<SimulateForm
+					style={{
+						zIndex: '10',
+					}}
+				/>
+			</Flex>
+			<Flex width={'100%'} height={'100%'} position={'absolute'}>
+				<Plot
+					style={{
+						width: '100%',
+						height: '100%',
+					}}
+					data={[...positionData, ...velocityData]}
+					layout={{
+						title: 'Position & Velocity',
+						scene: {
+							xaxis: { title: 'X' },
+							yaxis: { title: 'Y' },
+							zaxis: { title: 'Z' },
+						},
+						autosize: true,
+						dragmode: 'turntable',
+					}}
+					useResizeHandler
+					config={{
+						scrollZoom: true,
+					}}
+				/>
 			</Flex>
 		</div>
 	);
