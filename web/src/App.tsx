@@ -88,31 +88,46 @@ const App = () => {
 			}}
 		>
 			{/* Flex: https://www.radix-ui.com/themes/docs/components/flex */}
-			<Flex
-				direction="column"
-				m="4"
-				width="100%"
-				justify="center"
-				align="center"
-			>
-				<Heading as="h1" size="8" weight="bold" mb="4">
-					Simulation Data
-				</Heading>
-				<Link to={Routes.FORM}>Define new simulation parameters</Link>
-				<Separator size="4" my="5" />
-				<Flex direction="row" width="20%" justify="center">
-					<SimulateForm
-						width={'400px'}
+			<Flex direction="column" width="100%" justify="center" align="center">
+				<Flex direction="row" justify="center">
+					<Flex ml={'8'} mr={'3'} align={'center'}>
+						<SimulateForm
+							style={{
+								position: 'absolute',
+								width: '60vh',
+								// height: '100%',
+								height: '80vh',
+								zIndex: '10',
+								background: 'black',
+							}}
+						/>
+					</Flex>
+					<Plot
 						style={{
-							// position: 'absolute',
-							top: '5%',
-							left: 'calc(50% - 200px)',
-							overflow: 'scroll',
+							width: '100%',
+							height: '100%',
+							// position: 'relative',
+							position: 'absolute',
+							// zIndex: '-1',
+						}}
+						data={[...positionData, ...velocityData]}
+						layout={{
+							title: 'Position & Velocity',
+							scene: {
+								xaxis: { title: 'X' },
+								yaxis: { title: 'Y' },
+								zaxis: { title: 'Z' },
+							},
+							autosize: true,
+							dragmode: 'turntable',
+						}}
+						useResizeHandler
+						config={{
+							scrollZoom: true,
 						}}
 					/>
-				</Flex>
-				<Flex direction="row" width="80%" justify="center">
-					<Plot
+
+					{/* <Plot
 						style={{ width: '45%', height: '100%', margin: '5px' }}
 						data={positionData}
 						layout={{
@@ -147,7 +162,7 @@ const App = () => {
 						config={{
 							scrollZoom: true,
 						}}
-					/>
+					/> */}
 				</Flex>
 			</Flex>
 		</div>

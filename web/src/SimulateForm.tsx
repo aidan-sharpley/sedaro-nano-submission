@@ -1,27 +1,16 @@
-import { Form, FormField, FormLabel } from '@radix-ui/react-form';
-import {
-	Button,
-	Card,
-	Flex,
-	Heading,
-	Separator,
-	TextField,
-} from '@radix-ui/themes';
+import { Form } from '@radix-ui/react-form';
+import { Button, Card, Flex, Separator } from '@radix-ui/themes';
 import BaseCard from 'components/BaseCard';
 import _ from 'lodash';
 import React, { useCallback, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Routes } from 'routes';
-import { FormValue, defaultBody1, defaultBody2, Body } from 'types';
+import { defaultBody1, defaultBody2 } from 'types';
 
 type SimulateFormProps = {
-	style: object;
-	width: string;
+	style?: object;
+	width?: string;
 };
 
 const SimulateForm = ({ style, width }: SimulateFormProps) => {
-	const navigate = useNavigate();
-
 	const [formData, setFormData] = useState<FormData>({
 		Body1: defaultBody1,
 		Body2: defaultBody2,
@@ -42,7 +31,6 @@ const SimulateForm = ({ style, width }: SimulateFormProps) => {
 				if (!response.ok) {
 					throw new Error('Network response was not ok');
 				}
-				navigate(Routes.SIMULATION);
 			} catch (error) {
 				console.error('Error:', error);
 			}
@@ -50,25 +38,15 @@ const SimulateForm = ({ style, width }: SimulateFormProps) => {
 		[formData]
 	);
 
-	const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-		const { name, value } = e.target;
-		let newValue: FormValue = value === '' ? '' : parseFloat(value);
-		setFormData((prev) => _.set({ ...prev }, name, newValue));
-	}, []);
-
 	return (
-		<div style={style}>
+		<Flex>
 			{/* Card: https://www.radix-ui.com/themes/docs/components/card */}
-			<Card
-				style={{
-					width: width,
-				}}
-			>
+			<Card style={style}>
 				<Form onSubmit={handleSubmit}>
 					<BaseCard
 						title="Body1"
 						formData={formData}
-						handleChange={handleChange}
+						setFormData={setFormData}
 					/>
 					<Separator size="4" my="5" />
 					<BaseCard
@@ -89,7 +67,7 @@ const SimulateForm = ({ style, width }: SimulateFormProps) => {
 					</Flex>
 				</Form>
 			</Card>
-		</div>
+		</Flex>
 	);
 };
 
