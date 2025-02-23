@@ -77,7 +77,7 @@ const App = () => {
 				position={'absolute'}
 				ml={'1vh'}
 				mt={'5vh'}
-				height={'63vh'}
+				height={'65vh'}
 				width={'30vh'}
 			>
 				<SimulateForm

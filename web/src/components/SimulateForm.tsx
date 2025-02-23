@@ -41,7 +41,7 @@ const SimulateForm = ({ style, width }: SimulateFormProps) => {
 	return (
 		<Flex>
 			{/* Card: https://www.radix-ui.com/themes/docs/components/card */}
-			<Card size={'4'} style={{ background: 'black', ...style }}>
+			<Card size={'4'} style={{ overflowY: 'auto', ...style }}>
 				<Form onSubmit={handleSubmit}>
 					<Flex direction={'column'}>
 						<Flex justify="center" mt="-3">
@@ -58,7 +58,7 @@ const SimulateForm = ({ style, width }: SimulateFormProps) => {
 								setFormData={setFormData}
 							/>
 						</Flex>
-						<Flex justify="center" mt="5">
+						<Flex justify="center" mt="5" mb="1">
 							<BaseCard
 								title="Batch"
 								formData={formData}
