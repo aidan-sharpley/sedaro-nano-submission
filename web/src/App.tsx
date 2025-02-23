@@ -1,4 +1,5 @@
 import { Flex, Heading, Separator, Table } from '@radix-ui/themes';
+import SimulateForm from 'SimulateForm';
 import { useEffect, useState } from 'react';
 import Plot from 'react-plotly.js';
 import { Link } from 'react-router-dom';
@@ -99,7 +100,18 @@ const App = () => {
 				</Heading>
 				<Link to={Routes.FORM}>Define new simulation parameters</Link>
 				<Separator size="4" my="5" />
-				<Flex direction="row" width="100%" justify="center">
+				<Flex direction="row" width="20%" justify="center">
+					<SimulateForm
+						width={'400px'}
+						style={{
+							// position: 'absolute',
+							top: '5%',
+							left: 'calc(50% - 200px)',
+							overflow: 'scroll',
+						}}
+					/>
+				</Flex>
+				<Flex direction="row" width="80%" justify="center">
 					<Plot
 						style={{ width: '45%', height: '100%', margin: '5px' }}
 						data={positionData}
@@ -136,42 +148,6 @@ const App = () => {
 							scrollZoom: true,
 						}}
 					/>
-				</Flex>
-				<Flex justify="center" width="100%" m="4">
-					<Table.Root
-						style={{
-							width: '800px',
-						}}
-					>
-						{/* Table: https://www.radix-ui.com/themes/docs/components/table */}
-						<Table.Header>
-							<Table.Row>
-								<Table.ColumnHeaderCell>Agent</Table.ColumnHeaderCell>
-								<Table.ColumnHeaderCell>
-									Initial Position (x,y, z)
-								</Table.ColumnHeaderCell>
-								<Table.ColumnHeaderCell>
-									Initial Velocity (x,y)
-								</Table.ColumnHeaderCell>
-							</Table.Row>
-						</Table.Header>
-
-						<Table.Body>
-							{Object.entries(initialState).map(
-								([agentId, { x, y, z, vx, vy, vz }]) => (
-									<Table.Row key={agentId}>
-										<Table.RowHeaderCell>{agentId}</Table.RowHeaderCell>
-										<Table.Cell>
-											({x}, {y}, {z})
-										</Table.Cell>
-										<Table.Cell>
-											({vx}, {vy}, {vz})
-										</Table.Cell>
-									</Table.Row>
-								)
-							)}
-						</Table.Body>
-					</Table.Root>
 				</Flex>
 			</Flex>
 		</div>

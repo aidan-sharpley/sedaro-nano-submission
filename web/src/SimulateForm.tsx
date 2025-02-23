@@ -14,15 +14,12 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Routes } from 'routes';
 import { FormValue, defaultBody1, defaultBody2, Body } from 'types';
 
-type SimRequest<FormData> = {
-	Body1: Body;
-	Body2: Body;
-
-	// TODO: make actual batch
-	Batch: Body;
+type SimulateFormProps = {
+	style: object;
+	width: string;
 };
 
-const SimulateForm: React.FC = () => {
+const SimulateForm = ({ style, width }: SimulateFormProps) => {
 	const navigate = useNavigate();
 
 	const [formData, setFormData] = useState<FormData>({
@@ -60,25 +57,13 @@ const SimulateForm: React.FC = () => {
 	}, []);
 
 	return (
-		<div
-			style={{
-				position: 'absolute',
-				top: '5%',
-				left: 'calc(50% - 200px)',
-				overflow: 'scroll',
-			}}
-		>
+		<div style={style}>
 			{/* Card: https://www.radix-ui.com/themes/docs/components/card */}
 			<Card
 				style={{
-					width: '400px',
+					width: width,
 				}}
 			>
-				<Heading as="h2" size="4" weight="bold" mb="4">
-					Run a Simulation
-				</Heading>
-				<Link to={Routes.SIMULATION}>View previous simulation</Link>
-				<Separator size="4" my="5" />
 				<Form onSubmit={handleSubmit}>
 					<BaseCard
 						title="Body1"
