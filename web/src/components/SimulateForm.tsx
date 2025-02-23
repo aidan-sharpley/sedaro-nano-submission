@@ -1,16 +1,29 @@
 import { Form } from '@radix-ui/react-form';
-import { Button, Card, Flex, Separator } from '@radix-ui/themes';
+import {
+	Button,
+	Card,
+	Flex,
+	Separator,
+	TextField,
+	ThickDividerHorizontalIcon,
+} from '@radix-ui/themes';
 import BaseCard from 'components/BaseCard';
 import _ from 'lodash';
 import React, { useCallback, useState } from 'react';
-import { defaultBody1, defaultBody2 } from 'types';
+import { FormValue, defaultBody1, defaultBody2 } from 'types';
+import Input from './Input';
 
 type SimulateFormProps = {
 	style?: object;
-	width?: string;
+	setSimulationCount: React.Dispatch<React.SetStateAction<number>>;
+	simulationCount?: number;
 };
 
-const SimulateForm = ({ style, width }: SimulateFormProps) => {
+const SimulateForm = ({
+	style,
+	setSimulationCount,
+	simulationCount,
+}: SimulateFormProps) => {
 	const [formData, setFormData] = useState<FormData>({
 		Body1: defaultBody1,
 		Body2: defaultBody2,
@@ -44,7 +57,7 @@ const SimulateForm = ({ style, width }: SimulateFormProps) => {
 			<Card size={'4'} style={{ overflowY: 'auto', ...style }}>
 				<Form onSubmit={handleSubmit}>
 					<Flex direction={'column'}>
-						<Flex justify="center" mt="-3">
+						<Flex justify="center" mt={'-3'}>
 							<BaseCard
 								title="Body1"
 								formData={formData}
@@ -66,8 +79,22 @@ const SimulateForm = ({ style, width }: SimulateFormProps) => {
 								required={false}
 							/>
 						</Flex>
-						<Flex justify="center" mt="5">
-							<Button type="submit">Submit</Button>
+						<Flex direction={'row'} gap={'4'} mt="5">
+							<Button type="submit">Run Simulation</Button>
+							{'   X   '}
+							<TextField.Root
+								type="number"
+								id={'batch.count'}
+								name={'batch.count'}
+								value={simulationCount}
+								onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+									const { value } = e.target;
+									let newValue: FormValue =
+										value === '' ? '' : parseFloat(value);
+									setSimulationCount(newValue);
+								}}
+								step={1}
+							/>
 						</Flex>
 					</Flex>
 				</Form>

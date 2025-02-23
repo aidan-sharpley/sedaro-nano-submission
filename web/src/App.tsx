@@ -28,11 +28,14 @@ const App = () => {
 	const [positionData, setPositionData] = useState<PlottedAgentData[]>([]);
 	const [velocityData, setVelocityData] = useState<PlottedAgentData[]>([]);
 
-	const { refetch, data } = useQuery({
+	const [simulationCount, setSimulationCount] = useState<number>(1);
+
+	const { isLoading, data } = useQuery({
 		queryKey: ['queryAPI'],
 		refetchInterval: 3000, // 3 second pings of data
 		queryFn: () =>
-			fetch('http://localhost:8000/simulation').then((res) => res.json()),
+			fetch(`http://localhost:8000/simulation`).then((res) => res.json()),
+		enabled: !!simulationCount,
 	});
 
 	useEffect(() => {
@@ -84,6 +87,8 @@ const App = () => {
 					style={{
 						zIndex: '10',
 					}}
+					setSimulationCount={setSimulationCount}
+					simulationCount={simulationCount}
 				/>
 			</Flex>
 			<Flex width={'100%'} height={'100%'} position={'absolute'}>

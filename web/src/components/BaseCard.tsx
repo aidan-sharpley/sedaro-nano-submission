@@ -10,6 +10,7 @@ type BaseCardProps = {
 	title: string;
 	required?: boolean;
 	fontSize?: number;
+	enabled?: boolean;
 };
 
 function BaseCard({
@@ -18,6 +19,7 @@ function BaseCard({
 	setFormData,
 	required = true,
 	fontSize = 12,
+	enabled = true,
 }: BaseCardProps) {
 	return (
 		<Flex justify="center" m="3">
@@ -75,13 +77,13 @@ function BaseCard({
 						<Table.RowHeaderCell style={{ fontSize: fontSize }}>
 							Mass
 						</Table.RowHeaderCell>
-
 						<Input
 							field={'mass'}
 							formData={formData}
 							setFormData={setFormData}
 							title={title}
 							required={required}
+							enabled={enabled}
 						/>
 					</Table.Row>
 				</Table.Body>
