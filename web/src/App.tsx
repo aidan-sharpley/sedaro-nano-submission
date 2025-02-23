@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import SimulateForm from 'components/SimulateForm';
 import { useEffect, useState } from 'react';
 import Plot from 'react-plotly.js';
+import { SimulationViewEnum } from 'types';
 
 // Input data from the simulation
 type AgentData = Record<string, number>;
@@ -29,6 +30,8 @@ const App = () => {
 	const [velocityData, setVelocityData] = useState<PlottedAgentData[]>([]);
 
 	const [simulationCount, setSimulationCount] = useState<number>(1);
+	const [simulationView, setSimulationView] =
+		useState<SimulationViewEnum>('Both');
 
 	const { isLoading, data } = useQuery({
 		queryKey: ['queryAPI'],
@@ -89,6 +92,8 @@ const App = () => {
 					}}
 					setSimulationCount={setSimulationCount}
 					simulationCount={simulationCount}
+					simulationView={simulationView}
+					setSimulationView={setSimulationView}
 				/>
 			</Flex>
 			<Flex width={'100%'} height={'100%'} position={'absolute'}>
@@ -97,7 +102,15 @@ const App = () => {
 						width: '100%',
 						height: '100%',
 					}}
-					data={[...positionData, ...velocityData]}
+					data={
+						simulationView == 'Position'
+							? positionData
+							: simulationView == 'Velocity'
+							? velocityData
+							: simulationView == 'Both'
+							? [...positionData, ...velocityData]
+							: []
+					}
 					layout={{
 						title: 'Position & Velocity',
 						scene: {
