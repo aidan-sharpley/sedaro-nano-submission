@@ -7,7 +7,7 @@ import { Routes } from 'routes';
 import App from './App';
 import './index.css';
 import NotFound from './NotFound';
-import SimulateForm from './components/SimulateForm';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 const router = createBrowserRouter([
 	{
@@ -17,12 +17,16 @@ const router = createBrowserRouter([
 	},
 ]);
 
+const queryClient = new QueryClient();
+
 const root = ReactDOM.createRoot(document.getElementById('root')!);
 root.render(
 	<React.StrictMode>
 		{/* Theme: https://www.radix-ui.com/themes/docs/theme/overview */}
 		<Theme accentColor="iris" grayColor="mauve" radius="full">
-			<RouterProvider router={router} />
+			<QueryClientProvider client={queryClient}>
+				<RouterProvider router={router} />
+			</QueryClientProvider>
 		</Theme>
 	</React.StrictMode>
 );

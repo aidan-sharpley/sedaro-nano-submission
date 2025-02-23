@@ -76,7 +76,7 @@ def simulate():
     # Run simulation
     simulation_data = simulator.simulate()
 
-    # Don't hold up response with commit to DB
+    # Don't hold up response with commit to DB, for speed. Would not do this if strong consistency is required in the system, but figured the entire simulation should fail if it can't commit in a real world situation.
     Thread(target=session_commit, args=(Simulation(data=simulation_data),)).start()
 
     return app.response_class(response=simulation_data, mimetype='application/json')

@@ -1,4 +1,5 @@
 import { Flex } from '@radix-ui/themes';
+import { useQuery } from '@tanstack/react-query';
 import SimulateForm from 'components/SimulateForm';
 import { useEffect, useState } from 'react';
 import Plot from 'react-plotly.js';
@@ -26,56 +27,42 @@ const App = () => {
 	// Store plot data in state.
 	const [positionData, setPositionData] = useState<PlottedAgentData[]>([]);
 	const [velocityData, setVelocityData] = useState<PlottedAgentData[]>([]);
-	const [initialState, setInitialState] = useState<DataFrame>({});
+
+	const { refetch, data } = useQuery({
+		queryKey: ['queryAPI'],
+		refetchInterval: 3000, // 3 second pings of data
+		queryFn: () =>
+			fetch('http://localhost:8000/simulation').then((res) => res.json()),
+	});
 
 	useEffect(() => {
-		// fetch plot data when the component mounts
-		let canceled = false;
+		try {
+			// data should be populated from a POST call to the simulation server
+			const updatedPositionData: PlottedFrame = {};
+			const updatedVelocityData: PlottedFrame = {};
 
-		async function fetchData() {
-			console.log('calling fetchdata...');
+			(data as DataPoint[]).forEach(([t0, t1, frame]) => {
+				for (let [agentId, { x, y, z, vx, vy, vz }] of Object.entries(frame)) {
+					updatedPositionData[agentId] =
+						updatedPositionData[agentId] || baseData();
+					updatedPositionData[agentId].x.push(x);
+					updatedPositionData[agentId].y.push(y);
+					updatedPositionData[agentId].z.push(z);
 
-			try {
-				// data should be populated from a POST call to the simulation server
-				const response = await fetch('http://localhost:8000/simulation');
-				if (canceled) return;
-				const data: DataPoint[] = await response.json();
-				const updatedPositionData: PlottedFrame = {};
-				const updatedVelocityData: PlottedFrame = {};
-
-				setInitialState(data[0][2]);
-
-				data.forEach(([t0, t1, frame]) => {
-					for (let [agentId, { x, y, z, vx, vy, vz }] of Object.entries(
-						frame
-					)) {
-						updatedPositionData[agentId] =
-							updatedPositionData[agentId] || baseData();
-						updatedPositionData[agentId].x.push(x);
-						updatedPositionData[agentId].y.push(y);
-						updatedPositionData[agentId].z.push(z);
-
-						updatedVelocityData[agentId] =
-							updatedVelocityData[agentId] || baseData();
-						updatedVelocityData[agentId].x.push(vx);
-						updatedVelocityData[agentId].y.push(vy);
-						updatedVelocityData[agentId].z.push(vz);
-					}
-				});
-				setPositionData(Object.values(updatedPositionData));
-				setVelocityData(Object.values(updatedVelocityData));
-				console.log('Set plot data!');
-			} catch (error) {
-				console.error('Error fetching data:', error);
-			}
+					updatedVelocityData[agentId] =
+						updatedVelocityData[agentId] || baseData();
+					updatedVelocityData[agentId].x.push(vx);
+					updatedVelocityData[agentId].y.push(vy);
+					updatedVelocityData[agentId].z.push(vz);
+				}
+			});
+			setPositionData(Object.values(updatedPositionData));
+			setVelocityData(Object.values(updatedVelocityData));
+			console.log('Set plot data!');
+		} catch (error) {
+			console.error('Error fetching data:', error);
 		}
-
-		fetchData();
-
-		return () => {
-			canceled = true;
-		};
-	}, []);
+	}, [data]);
 
 	return (
 		<div
