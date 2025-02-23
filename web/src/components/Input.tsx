@@ -26,7 +26,7 @@ function Input({
 				<TextField.Root
 					type="number"
 					id={`${title}.${field ?? ''}`}
-					name={`${title}.${field ?? ''}`}
+					name={`${title}.${field}`}
 					value={formData?.[title]?.[field]}
 					onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 						const { name, value } = e.target;

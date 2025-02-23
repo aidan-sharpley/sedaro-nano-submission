@@ -9,7 +9,7 @@ type BodyRowProps = {
 	title: string;
 	required?: boolean;
 	fontSize?: number;
-	rowKey: string;
+	rowKey: 'Position' | 'Velocity' | 'Mass';
 };
 
 function BodyRow({
@@ -20,27 +20,29 @@ function BodyRow({
 	fontSize = 12,
 	rowKey,
 }: BodyRowProps) {
+	const ifVelocityRowField = rowKey == 'Velocity' ? 'v' : '';
+
 	return (
 		<Table.Row align={'center'} key={`${rowKey}-key`}>
 			<Table.RowHeaderCell style={{ fontSize: fontSize }}>
 				{rowKey}
 			</Table.RowHeaderCell>
 			<Input
-				field={'x'}
+				field={ifVelocityRowField + 'x'}
 				formData={formData}
 				setFormData={setFormData}
 				title={title}
 				required={required}
 			/>
 			<Input
-				field={'y'}
+				field={ifVelocityRowField + 'y'}
 				formData={formData}
 				setFormData={setFormData}
 				title={title}
 				required={required}
 			/>
 			<Input
-				field={'z'}
+				field={ifVelocityRowField + 'z'}
 				formData={formData}
 				setFormData={setFormData}
 				title={title}

@@ -71,14 +71,19 @@ function BaseCard({
 						fontSize={fontSize}
 						required={required}
 					/>
-					<BodyRow
-						formData={formData}
-						setFormData={setFormData}
-						title={title}
-						rowKey={'Mass'}
-						fontSize={fontSize}
-						required={required}
-					/>
+					<Table.Row align={'center'} key={`Mass-key`}>
+						<Table.RowHeaderCell style={{ fontSize: fontSize }}>
+							Mass
+						</Table.RowHeaderCell>
+
+						<Input
+							field={'mass'}
+							formData={formData}
+							setFormData={setFormData}
+							title={title}
+							required={required}
+						/>
+					</Table.Row>
 				</Table.Body>
 			</Table.Root>
 		</Flex>
