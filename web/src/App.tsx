@@ -1,9 +1,7 @@
-import { Flex, Heading, Separator, Table } from '@radix-ui/themes';
-import SimulateForm from 'SimulateForm';
+import { Flex } from '@radix-ui/themes';
+import SimulateForm from 'components/SimulateForm';
 import { useEffect, useState } from 'react';
 import Plot from 'react-plotly.js';
-import { Link } from 'react-router-dom';
-import { Routes } from 'routes';
 
 // Input data from the simulation
 type AgentData = Record<string, number>;
