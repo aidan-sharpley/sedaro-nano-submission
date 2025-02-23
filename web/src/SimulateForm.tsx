@@ -43,27 +43,29 @@ const SimulateForm = ({ style, width }: SimulateFormProps) => {
 			{/* Card: https://www.radix-ui.com/themes/docs/components/card */}
 			<Card style={{ background: 'black', ...style }}>
 				<Form onSubmit={handleSubmit}>
-					<BaseCard
-						title="Body1"
-						formData={formData}
-						setFormData={setFormData}
-					/>
-					<Separator size="4" my="5" />
-					<BaseCard
-						title="Body2"
-						formData={formData}
-						setFormData={setFormData}
-					/>
-					<Separator size="4" my="5" />
-					<BaseCard
-						title="Batch"
-						formData={formData}
-						setFormData={setFormData}
-						required={false}
-					/>
-					<Separator size="4" my="5" />
-					<Flex justify="center" m="5">
-						<Button type="submit">Submit</Button>
+					<Flex my={'2'} direction={'column'}>
+						<BaseCard
+							title="Body1"
+							formData={formData}
+							setFormData={setFormData}
+						/>
+						<Separator size="4" my="3" />
+						<BaseCard
+							title="Body2"
+							formData={formData}
+							setFormData={setFormData}
+						/>
+						<Separator size="4" my="3" />
+						<BaseCard
+							title="Batch"
+							formData={formData}
+							setFormData={setFormData}
+							required={false}
+						/>
+						<Separator size="4" my="3" />
+						<Flex justify="center">
+							<Button type="submit">Submit</Button>
+						</Flex>
 					</Flex>
 				</Form>
 			</Card>

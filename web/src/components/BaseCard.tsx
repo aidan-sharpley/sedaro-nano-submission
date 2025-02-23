@@ -2,13 +2,14 @@ import { Flex, Heading, Table, Tooltip } from '@radix-ui/themes';
 import _ from 'lodash';
 import React from 'react';
 import Input from './Input';
+import BodyRow from './BodyRow';
 
 type BaseCardProps = {
 	formData: FormData;
 	setFormData: React.Dispatch<React.SetStateAction<FormData>>;
 	title: string;
 	required?: boolean;
-	onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+	fontSize?: number;
 };
 
 function BaseCard({
@@ -16,35 +17,37 @@ function BaseCard({
 	formData,
 	setFormData,
 	required = true,
-	onChange,
+	fontSize = 12,
 }: BaseCardProps) {
 	return (
-		<Flex justify="center" m="4">
+		<Flex justify="center" m="3">
 			<Table.Root m={'-4'} size={'1'} my="-5">
 				{/* Table: https://www.radix-ui.com/themes/docs/components/table */}
 				<Table.Header>
 					<Table.Row>
-						<Table.ColumnHeaderCell>{title}</Table.ColumnHeaderCell>
+						<Table.ColumnHeaderCell style={{ fontSize: fontSize + 1 }}>
+							{title}
+						</Table.ColumnHeaderCell>
 						<Tooltip content={'Initial X-position'}>
 							<Table.ColumnHeaderCell
+								style={{ fontSize: fontSize }}
 								justify={'center'}
-								style={{ fontSize: 13 }}
 							>
 								X
 							</Table.ColumnHeaderCell>
 						</Tooltip>
 						<Tooltip content={'Initial Y-position'}>
 							<Table.ColumnHeaderCell
+								style={{ fontSize: fontSize }}
 								justify={'center'}
-								style={{ fontSize: 13 }}
 							>
 								Y
 							</Table.ColumnHeaderCell>
 						</Tooltip>
 						<Tooltip content={'Initial Z-position'}>
 							<Table.ColumnHeaderCell
+								style={{ fontSize: fontSize }}
 								justify={'center'}
-								style={{ fontSize: 13 }}
 							>
 								Z
 							</Table.ColumnHeaderCell>
@@ -52,64 +55,30 @@ function BaseCard({
 					</Table.Row>
 				</Table.Header>
 				<Table.Body>
-					<Table.Row align={'center'} key={'position-key'}>
-						<Table.RowHeaderCell>{'Position'}</Table.RowHeaderCell>
-						<Input
-							field={'x'}
-							formData={formData}
-							setFormData={setFormData}
-							title={title}
-							required={required}
-						/>
-						<Input
-							field={'y'}
-							formData={formData}
-							setFormData={setFormData}
-							title={title}
-							required={required}
-						/>
-						<Input
-							field={'z'}
-							formData={formData}
-							setFormData={setFormData}
-							title={title}
-							required={required}
-						/>
-					</Table.Row>
-					<Table.Row align={'center'} key={'velocity-key'}>
-						<Table.RowHeaderCell>{'Velocity'}</Table.RowHeaderCell>
-						<Input
-							field={'vx'}
-							formData={formData}
-							setFormData={setFormData}
-							title={title}
-							required={required}
-						/>
-						<Input
-							field={'vy'}
-							formData={formData}
-							setFormData={setFormData}
-							title={title}
-							required={required}
-						/>
-						<Input
-							field={'vz'}
-							formData={formData}
-							setFormData={setFormData}
-							title={title}
-							required={required}
-						/>
-					</Table.Row>
-					<Table.Row align={'center'} key={'mass-key'}>
-						<Table.RowHeaderCell>{'Mass'}</Table.RowHeaderCell>
-						<Input
-							field={'mass'}
-							formData={formData}
-							setFormData={setFormData}
-							title={title}
-							required={required}
-						/>
-					</Table.Row>
+					<BodyRow
+						formData={formData}
+						setFormData={setFormData}
+						title={title}
+						rowKey={'Position'}
+						fontSize={fontSize}
+						required={required}
+					/>
+					<BodyRow
+						formData={formData}
+						setFormData={setFormData}
+						title={title}
+						rowKey={'Velocity'}
+						fontSize={fontSize}
+						required={required}
+					/>
+					<BodyRow
+						formData={formData}
+						setFormData={setFormData}
+						title={title}
+						rowKey={'Mass'}
+						fontSize={fontSize}
+						required={required}
+					/>
 				</Table.Body>
 			</Table.Root>
 		</Flex>
