@@ -1,4 +1,5 @@
 import {
+	Button,
 	DropdownMenu,
 	Flex,
 	ThickDividerHorizontalIcon,
@@ -19,12 +20,9 @@ const ViewDropdown = ({
 	return (
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger asChild>
-				<button className="IconButton" aria-label="Customise options">
-					<Flex justify={'center'}>
-						<strong>{'View'}</strong>
-					</Flex>
-					{simulationView == 'Both' ? 'P&V' : simulationView}
-				</button>
+				<Button type="submit">
+					View: {simulationView == 'Both' ? 'P&V' : simulationView}
+				</Button>
 			</DropdownMenu.Trigger>
 			<DropdownMenu.Content className="DropdownMenuContent" sideOffset={5}>
 				<DropdownMenu.Item

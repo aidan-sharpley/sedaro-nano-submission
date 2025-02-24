@@ -81,9 +81,9 @@ const App = () => {
 			{/* Flex: https://www.radix-ui.com/themes/docs/components/flex */}
 			<Flex
 				position={'absolute'}
-				ml={'1vh'}
+				ml={'4vh'}
 				mt={'5vh'}
-				height={'66vh'}
+				height={'65vh'}
 				width={'30vh'}
 			>
 				<SimulateForm

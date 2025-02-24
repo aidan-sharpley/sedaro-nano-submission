@@ -57,7 +57,16 @@ const SimulateForm = ({
 	return (
 		<Flex>
 			{/* Card: https://www.radix-ui.com/themes/docs/components/card */}
-			<Card size={'4'} style={{ overflowY: 'auto', ...style }}>
+			<Card
+				size={'4'}
+				style={{
+					opacity: '99%',
+					backgroundColor: 'transparent',
+
+					overflowY: 'auto',
+					...style,
+				}}
+			>
 				<Form onSubmit={handleSubmit}>
 					<Flex direction={'column'}>
 						<Flex justify="center" mt={'-3'}>
@@ -82,14 +91,7 @@ const SimulateForm = ({
 								required={false}
 							/>
 						</Flex>
-
-						<Flex
-							direction={'row'}
-							gap={'2'}
-							mt="5"
-							align={'center'}
-							justify={'center'}
-						>
+						<Flex direction={'row'} gap={'2'} mt="5" justify={'center'}>
 							<ViewDropdown
 								simulationView={simulationView}
 								setSimulationView={setSimulationView}
