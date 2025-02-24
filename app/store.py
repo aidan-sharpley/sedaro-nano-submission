@@ -2,6 +2,8 @@
 
 import doctest
 
+from models import Body
+
 
 class QRangeStore:
     """
@@ -35,22 +37,31 @@ class QRangeStore:
     """
 
     def __init__(self):
-        self.store = []
+        self.store: list[tuple[int | float, int | float, dict[str, Body]]] = []
 
-    def __setitem__(self, rng, value):
+    def __setitem__(self, rng: tuple[float, float], value: dict[str, Body]):
         try:
             (low, high) = rng
         except (TypeError, ValueError):
-            raise IndexError("Invalid Range: must provide a low and high value.")
+            raise IndexError('Invalid Range: must provide a low and high value.')
+
         if not low < high:
-            raise IndexError("Invalid Range.")
+            raise IndexError('Invalid Range.')
+
         self.store.append((low, high, value))
 
-    def __getitem__(self, key):
-        ret = [v for (l, h, v) in self.store if l <= key < h]
-        if not ret:
-            raise IndexError("Not found.")
-        return ret
+    def __getitem__(self, key: int | float):
+        # It does not matter if the time series is reversed
+        # here because only one set of attributes per Body
+        # will occupy the same time range, you'll only
+        # see at most one of each.
+        return list(self.store_search_generator(key))
+
+    def store_search_generator(self, key: int | float):
+        # Reverse the store because we know that the key is ascending in value as the simulation progresses (time), so we may find our values faster.
+        for low, high, v in reversed(self.store):
+            if high > key >= low:
+                yield v
 
 
 doctest.testmod()

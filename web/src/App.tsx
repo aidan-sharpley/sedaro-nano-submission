@@ -1,165 +1,155 @@
-import { Flex, Heading, Separator, Table } from '@radix-ui/themes';
+import { Flex } from '@radix-ui/themes';
+import { useQuery } from '@tanstack/react-query';
+import SimulateForm from 'components/SimulateForm';
 import { useEffect, useState } from 'react';
 import Plot from 'react-plotly.js';
-import { Link } from 'react-router-dom';
-import { Routes } from 'routes';
+import { SimulationViewEnum } from 'types';
 
 // Input data from the simulation
 type AgentData = Record<string, number>;
 type DataFrame = Record<string, AgentData>;
 type DataPoint = [number, number, DataFrame];
+type DataSet = DataPoint[][];
 
 // Output data to the plot
 type PlottedAgentData = Record<string, number[]>;
 type PlottedFrame = Record<string, PlottedAgentData>;
 
+const baseData = (name: string) => ({
+	x: [],
+	y: [],
+	z: [],
+	t: [],
+	type: 'scatter3d',
+	mode: 'lines+markers',
+	marker: { size: 4 },
+	line: { width: 2 },
+	name: name,
+});
+
 const App = () => {
-  // Store plot data in state.
-  const [positionData, setPositionData] = useState<PlottedAgentData[]>([]);
-  const [velocityData, setVelocityData] = useState<PlottedAgentData[]>([]);
-  const [initialState, setInitialState] = useState<DataFrame>({});
+	// Store plot data in state.
+	const [positionData, setPositionData] = useState<PlottedAgentData[]>([]);
+	const [velocityData, setVelocityData] = useState<PlottedAgentData[]>([]);
 
-  useEffect(() => {
-    // fetch plot data when the component mounts
-    let canceled = false;
+	const [simulationCount, setSimulationCount] = useState<number>(1);
+	const [simulationView, setSimulationView] =
+		useState<SimulationViewEnum>('Both');
 
-    async function fetchData() {
-      console.log('calling fetchdata...');
+	const { data, refetch } = useQuery({
+		queryKey: [`queryAPI`],
+		placeholderData: (prev) => prev,
+		queryFn: () =>
+			fetch(`http://localhost:8000/simulation?limit=${simulationCount}`).then(
+				(res) => res.json()
+			),
+	});
 
-      try {
-        // data should be populated from a POST call to the simulation server
-        const response = await fetch('http://localhost:8000/simulation');
-        if (canceled) return;
-        const data: DataPoint[] = await response.json();
-        const updatedPositionData: PlottedFrame = {};
-        const updatedVelocityData: PlottedFrame = {};
+	useEffect(() => {
+		// data should be populated from a POST call to the simulation server
+		const combinedPositionData: PlottedAgentData[] = [];
+		const combinedVelocityData: PlottedAgentData[] = [];
 
-        setInitialState(data[0][2]);
+		try {
+			(data as DataSet).forEach((ds, i) => {
+				const updatedPositionData: PlottedFrame = {};
+				const updatedVelocityData: PlottedFrame = {};
 
-        const baseData = () => ({
-          x: [],
-          y: [],
-          z: [],
-          type: 'scatter3d',
-          mode: 'lines+markers',
-          marker: { size: 4 },
-          line: { width: 2 },
-        });
+				ds.forEach(([t0, t1, frame]) => {
+					for (let [agentId, { x, y, z, vx, vy, vz }] of Object.entries(
+						frame
+					)) {
+						const positionID = i + 'P' + agentId;
+						const velocityID = i + 'V' + agentId;
 
-        data.forEach(([t0, t1, frame]) => {
-          for (let [agentId, { x, y, z, vx, vy, vz }] of Object.entries(frame)) {
-            updatedPositionData[agentId] = updatedPositionData[agentId] || baseData();
-            updatedPositionData[agentId].x.push(x);
-            updatedPositionData[agentId].y.push(y);
-            updatedPositionData[agentId].z.push(z);
+						updatedPositionData[positionID] =
+							updatedPositionData[positionID] || baseData(positionID);
+						updatedPositionData[positionID].x.push(x);
+						updatedPositionData[positionID].y.push(y);
+						updatedPositionData[positionID].z.push(z);
 
-            updatedVelocityData[agentId] = updatedVelocityData[agentId] || baseData();
-            updatedVelocityData[agentId].x.push(vx);
-            updatedVelocityData[agentId].y.push(vy);
-            updatedVelocityData[agentId].z.push(vz);
-          }
-        });
-        setPositionData(Object.values(updatedPositionData));
-        setVelocityData(Object.values(updatedVelocityData));
-        console.log('Set plot data!');
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      }
-    }
+						updatedVelocityData[velocityID] =
+							updatedVelocityData[velocityID] || baseData(velocityID);
+						updatedVelocityData[velocityID].x.push(vx);
+						updatedVelocityData[velocityID].y.push(vy);
+						updatedVelocityData[velocityID].z.push(vz);
+					}
+				});
+				combinedPositionData.push(...Object.values(updatedPositionData));
+				combinedVelocityData.push(...Object.values(updatedVelocityData));
+				console.log('Set plot data!');
+			});
 
-    fetchData();
+			setPositionData(combinedPositionData);
+			setVelocityData(combinedVelocityData);
+		} catch (error) {
+			console.error('Error fetching data:', error);
+		}
+	}, [data]);
 
-    return () => {
-      canceled = true;
-    };
-  }, []);
-
-  return (
-    <div
-      style={{
-        height: '100vh',
-        width: '100vw',
-        margin: '0 auto',
-      }}
-    >
-      {/* Flex: https://www.radix-ui.com/themes/docs/components/flex */}
-      <Flex direction="column" m="4" width="100%" justify="center" align="center">
-        <Heading as="h1" size="8" weight="bold" mb="4">
-          Simulation Data
-        </Heading>
-        <Link to={Routes.FORM}>Define new simulation parameters</Link>
-        <Separator size="4" my="5" />
-        <Flex direction="row" width="100%" justify="center">
-          <Plot
-            style={{ width: '45%', height: '100%', margin: '5px' }}
-            data={positionData}
-            layout={{
-              title: 'Position',
-              scene: {
-                xaxis: { title: 'X' },
-                yaxis: { title: 'Y' },
-                zaxis: { title: 'Z' },
-              },
-              autosize: true,
-              dragmode: 'turntable',
-            }}
-            useResizeHandler
-            config={{
-              scrollZoom: true,
-            }}
-          />
-          <Plot
-            style={{ width: '45%', height: '100%', margin: '5px' }}
-            data={velocityData}
-            layout={{
-              title: 'Velocity',
-              scene: {
-                xaxis: { title: 'X' },
-                yaxis: { title: 'Y' },
-                zaxis: { title: 'Z' },
-              },
-              autosize: true,
-              dragmode: 'turntable',
-            }}
-            useResizeHandler
-            config={{
-              scrollZoom: true,
-            }}
-          />
-        </Flex>
-        <Flex justify="center" width="100%" m="4">
-          <Table.Root
-            style={{
-              width: '800px',
-            }}
-          >
-            {/* Table: https://www.radix-ui.com/themes/docs/components/table */}
-            <Table.Header>
-              <Table.Row>
-                <Table.ColumnHeaderCell>Agent</Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell>Initial Position (x,y, z)</Table.ColumnHeaderCell>
-                <Table.ColumnHeaderCell>Initial Velocity (x,y)</Table.ColumnHeaderCell>
-              </Table.Row>
-            </Table.Header>
-
-            <Table.Body>
-              {Object.entries(initialState).map(([agentId, { x, y, z, vx, vy, vz }]) => (
-                <Table.Row key={agentId}>
-                  <Table.RowHeaderCell>{agentId}</Table.RowHeaderCell>
-                  <Table.Cell>
-                    ({x}, {y}, {z})
-                  </Table.Cell>
-                  <Table.Cell>
-                    ({vx}, {vy}, {vz})
-                  </Table.Cell>
-                </Table.Row>
-              ))}
-            </Table.Body>
-          </Table.Root>
-        </Flex>
-      </Flex>
-    </div>
-  );
+	return (
+		<div
+			style={{
+				height: '100vh',
+				width: '100vw',
+				margin: '0 auto',
+			}}
+		>
+			{/* Flex: https://www.radix-ui.com/themes/docs/components/flex */}
+			<Flex
+				position={'absolute'}
+				ml={'4vh'}
+				mt={'5vh'}
+				height={'65vh'}
+				width={'30vh'}
+			>
+				<SimulateForm
+					style={{
+						zIndex: '10',
+					}}
+					setSimulationCount={setSimulationCount}
+					simulationCount={simulationCount}
+					simulationView={simulationView}
+					setSimulationView={setSimulationView}
+					refreshData={refetch}
+				/>
+			</Flex>
+			<Flex width={'100%'} height={'100%'} position={'absolute'}>
+				<Plot
+					style={{
+						width: '100%',
+						height: '100%',
+					}}
+					data={
+						simulationView == 'Position'
+							? positionData
+							: simulationView == 'Velocity'
+							? velocityData
+							: simulationView == 'Both'
+							? [...positionData, ...velocityData]
+							: []
+					}
+					layout={{
+						title:
+							simulationView == 'Position' || simulationView == 'Velocity'
+								? simulationView
+								: 'Position & Velocity',
+						scene: {
+							xaxis: { title: 'X' },
+							yaxis: { title: 'Y' },
+							zaxis: { title: 'Z' },
+						},
+						autosize: true,
+						dragmode: 'orbit',
+					}}
+					useResizeHandler
+					config={{
+						scrollZoom: true,
+					}}
+				/>
+			</Flex>
+		</div>
+	);
 };
 
 export default App;
