@@ -28,7 +28,7 @@ function BaseCard({
 				<Table.Header>
 					<Table.Row>
 						<Table.ColumnHeaderCell style={{ fontSize: fontSize + 1 }}>
-							{title}
+							{title == 'Batch' ? 'Increments' : title}
 						</Table.ColumnHeaderCell>
 						<Tooltip content={'Initial X-position'}>
 							<Table.ColumnHeaderCell

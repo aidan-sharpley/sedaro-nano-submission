@@ -73,17 +73,18 @@ def simulate():
         print('failed to parse json from request')
         return 'bad request', 400
 
-    # Create store and simulator
-    simulator = Simulator(
-        store=QRangeStore(),
-        init=payload,
-    )
-
-    # Run simulation
-    simulation_data = simulator.simulate()
-
-    # Don't hold up response with commit to DB, for speed. Would not do this if strong consistency is required in the system, but figured the entire simulation should fail if it can't commit in a real world situation.
+    # Run batch of simulations with additional increments
     for _ in range(0, int(limit), 1):
+        # Create store and simulator
+        simulator = Simulator(
+            store=QRangeStore(),
+            init=payload,
+        )
+
+        # Run simulation
+        simulation_data = simulator.simulate()
+
+        # Don't hold up response with commit to DB, for speed. Would not do this if strong consistency is required in the system, but figured the entire simulation should fail if it can't commit in a real world situation.
         Thread(target=session_commit, args=(Simulation(data=simulation_data),)).start()
 
     return ''
