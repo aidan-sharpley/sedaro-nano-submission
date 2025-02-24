@@ -1,0 +1,53 @@
+import {
+	DropdownMenu,
+	Flex,
+	ThickDividerHorizontalIcon,
+} from '@radix-ui/themes';
+import _ from 'lodash';
+import React from 'react';
+import { SimulationViewEnum } from 'types';
+
+type ViewDropdownProps = {
+	simulationView?: SimulationViewEnum;
+	setSimulationView: React.Dispatch<React.SetStateAction<SimulationViewEnum>>;
+};
+
+const ViewDropdown = ({
+	simulationView,
+	setSimulationView,
+}: ViewDropdownProps) => {
+	return (
+		<DropdownMenu.Root>
+			<DropdownMenu.Trigger asChild>
+				<button className="IconButton" aria-label="Customise options">
+					<Flex justify={'center'}>
+						<strong>{'View'}</strong>
+					</Flex>
+					{simulationView == 'Both' ? 'P&V' : simulationView}
+				</button>
+			</DropdownMenu.Trigger>
+			<DropdownMenu.Content className="DropdownMenuContent" sideOffset={5}>
+				<DropdownMenu.Item
+					onSelect={() => setSimulationView('Both')}
+					className="DropdownMenuItem"
+				>
+					{'P&V' as SimulationViewEnum}
+				</DropdownMenu.Item>
+				<DropdownMenu.Item
+					onSelect={() => setSimulationView('Position')}
+					className="DropdownMenuItem"
+				>
+					{'Position' as SimulationViewEnum}
+				</DropdownMenu.Item>
+				<DropdownMenu.Item
+					onSelect={() => setSimulationView('Velocity')}
+					className="DropdownMenuItem"
+				>
+					{'Velocity' as SimulationViewEnum}
+				</DropdownMenu.Item>
+			</DropdownMenu.Content>
+		</DropdownMenu.Root>
+	);
+};
+
+export default ViewDropdown;

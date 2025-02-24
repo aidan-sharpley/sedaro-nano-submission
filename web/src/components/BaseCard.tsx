@@ -85,6 +85,8 @@ function BaseCard({
 							required={required}
 							enabled={enabled}
 						/>
+						<Table.Cell />
+						<Table.Cell />
 					</Table.Row>
 				</Table.Body>
 			</Table.Root>

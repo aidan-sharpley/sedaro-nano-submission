@@ -1,14 +1,5 @@
 import { Form } from '@radix-ui/react-form';
-import {
-	Button,
-	Card,
-	DropdownMenu,
-	Flex,
-	Separator,
-	TextField,
-	Portal,
-	ThickDividerHorizontalIcon,
-} from '@radix-ui/themes';
+import { Button, Card, Flex, TextField } from '@radix-ui/themes';
 import BaseCard from 'components/BaseCard';
 import _ from 'lodash';
 import React, { useCallback, useState } from 'react';
@@ -19,13 +10,7 @@ import {
 	defaultBody1,
 	defaultBody2,
 } from 'types';
-import {
-	HamburgerMenuIcon,
-	DotFilledIcon,
-	CheckIcon,
-	ChevronRightIcon,
-} from '@radix-ui/react-icons';
-import Input from './Input';
+import ViewDropdown from './ViewDropdown';
 
 type SimulateFormProps = {
 	style?: object;
@@ -75,40 +60,7 @@ const SimulateForm = ({
 			<Card size={'4'} style={{ overflowY: 'auto', ...style }}>
 				<Form onSubmit={handleSubmit}>
 					<Flex direction={'column'}>
-						<Flex align={'center'} gap={'2'} justify="left" mt={'-3'}>
-							{'Configuration'}
-							<DropdownMenu.Root>
-								<DropdownMenu.Trigger asChild>
-									<button className="IconButton" aria-label="Customise options">
-										{simulationView}
-									</button>
-								</DropdownMenu.Trigger>
-								<DropdownMenu.Content
-									className="DropdownMenuContent"
-									sideOffset={5}
-								>
-									<DropdownMenu.Item
-										onSelect={() => setSimulationView('Both')}
-										className="DropdownMenuItem"
-									>
-										{'Both' as SimulationViewEnum}
-									</DropdownMenu.Item>
-									<DropdownMenu.Item
-										onSelect={() => setSimulationView('Position')}
-										className="DropdownMenuItem"
-									>
-										{'Position' as SimulationViewEnum}
-									</DropdownMenu.Item>
-									<DropdownMenu.Item
-										onSelect={() => setSimulationView('Velocity')}
-										className="DropdownMenuItem"
-									>
-										{'Velocity' as SimulationViewEnum}
-									</DropdownMenu.Item>
-								</DropdownMenu.Content>
-							</DropdownMenu.Root>
-						</Flex>
-						<Flex justify="center" mt={'2'}>
+						<Flex justify="center" mt={'-3'}>
 							<BaseCard
 								title="Body1"
 								formData={formData}
@@ -130,22 +82,36 @@ const SimulateForm = ({
 								required={false}
 							/>
 						</Flex>
-						<Flex direction={'row'} gap={'4'} mt="5">
-							<Button type="submit">Run Simulation</Button>
-							{'   X   '}
-							<TextField.Root
-								type="number"
-								id={'batch.count'}
-								name={'batch.count'}
-								value={simulationCount}
-								onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-									const { value } = e.target;
-									let newValue: FormValue =
-										value === '' ? '' : parseFloat(value);
-									setSimulationCount(newValue);
-								}}
-								step={1}
+
+						<Flex
+							direction={'row'}
+							gap={'2'}
+							mt="5"
+							align={'center'}
+							justify={'center'}
+						>
+							<ViewDropdown
+								simulationView={simulationView}
+								setSimulationView={setSimulationView}
 							/>
+
+							<Button type="submit">
+								Simulation Loops:
+								<TextField.Root
+									type="number"
+									id={'batch.count'}
+									name={'batch.count'}
+									value={simulationCount}
+									style={{ width: 25 }}
+									onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+										const { value } = e.target;
+										let newValue: FormValue =
+											value === '' ? '' : parseFloat(value);
+										setSimulationCount(newValue);
+									}}
+									step={1}
+								/>
+							</Button>
 						</Flex>
 					</Flex>
 				</Form>
