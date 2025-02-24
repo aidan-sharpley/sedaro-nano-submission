@@ -1,7 +1,9 @@
 # HTTP SERVER
 
 
+import json
 from threading import Thread
+from typing import List
 
 from flask import Flask, request
 from flask_compress import Compress
@@ -9,7 +11,7 @@ from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-from models import SimulateRequest
+from models import Body, SimulateRequest
 from simulator import Simulator
 from store import QRangeStore
 
@@ -53,36 +55,58 @@ def health():
 
 @app.get('/simulation')
 def get_data():
-    # Get most recent simulation from database
-    simulation: Simulation = Simulation.query.order_by(Simulation.id.desc()).first()
-    return app.response_class(
-        response=simulation.data if simulation else [], mimetype='application/json'
+    limit = request.args.get('limit')
+
+    simulation: List[Simulation] = (
+        Simulation.query.order_by(Simulation.id.desc()).limit(limit=int(limit)).all()
     )
+
+    return [json.loads(s.data) for s in simulation]
 
 
 @app.post('/simulation')
 def simulate():
+    limit = request.args.get('limit')
+
     payload = SimulateRequest(request.get_json())
     if not payload:
         print('failed to parse json from request')
         return 'bad request', 400
 
-    # Create store and simulator
-    simulator = Simulator(
-        store=QRangeStore(),
-        init=payload,
-    )
+    # Run batch of simulations with additional increments
+    for i in range(0, int(limit), 1):
+        payload.Body1 = increment_input(payload.Body1, payload.Batch, i)
+        payload.Body2 = increment_input(payload.Body2, payload.Batch, i)
 
-    # Run simulation
-    simulation_data = simulator.simulate()
+        # Create store and simulator
+        simulator = Simulator(
+            store=QRangeStore(),
+            init=payload,
+        )
 
-    # Don't hold up response with commit to DB
-    Thread(target=session_commit, args=(Simulation(data=simulation_data),)).start()
+        # Run simulation
+        simulation_data = simulator.simulate()
 
-    return app.response_class(response=simulation_data, mimetype='application/json')
+        # Don't hold up response with commit to DB, for speed. Would not do this if strong consistency is required in the system, but figured the entire simulation should fail if it can't commit in a real world situation.
+        Thread(target=session_commit, args=(Simulation(data=simulation_data),)).start()
+
+    return ''
 
 
 def session_commit(simulation: Simulation):
     with app.app_context():
         db.session.add(simulation)
         db.session.commit()
+
+
+def increment_input(input: Body, incr: Body, idx: int):
+    return Body(
+        agentId=input.agentId,
+        x=input.x + (incr.x * idx),
+        y=input.y + (incr.y * idx),
+        z=input.z + (incr.z * idx),
+        vx=input.vx + (incr.vx * idx),
+        vy=input.vy + (incr.vy * idx),
+        vz=input.vz + (incr.vz * idx),
+        mass=input.mass + (incr.mass * idx),
+    )

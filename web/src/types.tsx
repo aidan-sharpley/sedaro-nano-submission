@@ -16,6 +16,8 @@ export type FormData = {
 	Body2: Body;
 };
 
+export type SimulationViewEnum = 'Both' | 'Position' | 'Velocity';
+
 export const defaultBody1: Body = {
 	agentId: 'Body1',
 	x: -0.73,

@@ -8,6 +8,7 @@ type InputProps = {
 	formData: FormData;
 	title: string;
 	required?: boolean;
+	enabled?: boolean;
 	field: string;
 	value?: number;
 	setFormData: (value: React.SetStateAction<FormData>) => void;
@@ -16,6 +17,7 @@ type InputProps = {
 function Input({
 	title,
 	required = true,
+	enabled = true,
 	field,
 	formData,
 	setFormData,
@@ -26,7 +28,7 @@ function Input({
 				<TextField.Root
 					type="number"
 					id={`${title}.${field ?? ''}`}
-					name={`${title}.${field ?? ''}`}
+					name={`${title}.${field}`}
 					value={formData?.[title]?.[field]}
 					onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 						const { name, value } = e.target;
