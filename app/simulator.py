@@ -57,8 +57,11 @@ class Simulator:
         if t < 0:
             return self.init
 
-        # Roll up results and set the most recent data for all agents at time in store.
-        return reduce(__or__, self.store[t], {})  # combine all data into one dictionary
+        lookup = self.store[t]
+
+        # Roll up results and data for all agents
+        # that have propagated time ranges upat time in store..
+        return reduce(__or__, lookup, {})  # combine all data into one dictionary
 
     def simulate_agent(self, primary_agent_id: str, secondary_agent_id: str):
         """
@@ -73,12 +76,13 @@ class Simulator:
         decremented_time = t - DEFAULT_SIMULATION_DECR
 
         # If the second body is not "caught up" in the time series
-        # we need to propagate the secondary before we can move
-        # the primary.
+        # we need to propagate the secondary and make sure
+        # `t` falls within the range of both primary and secondary bodies
+        # before we can propagate the primary.
         if self.times[secondary_agent_id] <= decremented_time:
             return
 
-        # See if bodies have both propagated to reach this point in time.
+        # Primary and secondary times overlap, we can propagate primary.
         universe = self.read(decremented_time)
 
         new_state = propagate(

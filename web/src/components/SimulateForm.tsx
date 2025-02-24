@@ -2,7 +2,7 @@ import { Form } from '@radix-ui/react-form';
 import { Button, Card, Flex, TextField } from '@radix-ui/themes';
 import BaseCard from 'components/BaseCard';
 import _ from 'lodash';
-import React, { useCallback, useState } from 'react';
+import React, { useState } from 'react';
 import {
 	FormValue,
 	SimulationViewEnum,
@@ -11,6 +11,7 @@ import {
 	defaultBody2,
 } from 'types';
 import ViewDropdown from './ViewDropdown';
+import { QueryObserverResult, RefetchOptions } from '@tanstack/react-query';
 
 type SimulateFormProps = {
 	style?: object;
@@ -18,6 +19,9 @@ type SimulateFormProps = {
 	simulationCount?: number;
 	simulationView?: SimulationViewEnum;
 	setSimulationView: React.Dispatch<React.SetStateAction<SimulationViewEnum>>;
+	refreshData: (
+		options?: RefetchOptions
+	) => Promise<QueryObserverResult<any, Error>>;
 };
 
 const SimulateForm = ({
@@ -26,6 +30,7 @@ const SimulateForm = ({
 	simulationCount = 1,
 	simulationView,
 	setSimulationView,
+	refreshData,
 }: SimulateFormProps) => {
 	const [formData, setFormData] = useState<FormData>({
 		Body1: defaultBody1,
@@ -33,29 +38,36 @@ const SimulateForm = ({
 		Batch: defaultBatch,
 	});
 
-	const handleSubmit = useCallback(
-		async (e: React.FormEvent) => {
-			e.preventDefault();
-			try {
-				const response = await fetch(
-					`http://localhost:8000/simulation?limit=${simulationCount}`,
-					{
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/json',
-						},
-						body: JSON.stringify(formData),
-					}
-				);
-				if (!response.ok) {
-					throw new Error('Network response was not ok');
+	const [isLoading, setIsLoading] = useState<boolean>(false);
+
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+		try {
+			setIsLoading(true);
+			const response = await fetch(
+				`http://localhost:8000/simulation?limit=${simulationCount}`,
+				{
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify(formData),
 				}
-			} catch (error) {
-				console.error('Error:', error);
+			);
+			if (!response.ok) {
+				throw new Error('Network response was not ok');
 			}
-		},
-		[formData]
-	);
+
+			// This is a hacky workaround due to time constraints,
+			// ideally we would get our updated data from the post.
+			// Alternatively, we could probably use rpc or server sent events.
+			refreshData();
+			setIsLoading(false);
+		} catch (error) {
+			console.error('Error:', error);
+			setIsLoading(false);
+		}
+	};
 
 	return (
 		<Flex>
@@ -92,6 +104,7 @@ const SimulateForm = ({
 								formData={formData}
 								setFormData={setFormData}
 								required={false}
+								enabled={simulationCount > 1}
 							/>
 						</Flex>
 						<Flex direction={'row'} gap={'2'} mt="5" justify={'center'}>
@@ -99,24 +112,24 @@ const SimulateForm = ({
 								simulationView={simulationView}
 								setSimulationView={setSimulationView}
 							/>
-
-							<Button type="submit">
-								Run Simulation(s)
-								<TextField.Root
-									type="number"
-									id={'batch.count'}
-									name={'batch.count'}
-									value={simulationCount}
-									style={{ width: 25 }}
-									onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-										const { value } = e.target;
-										let newValue: FormValue =
-											value === '' ? '' : parseFloat(value);
-										setSimulationCount(newValue);
-									}}
-									step={1}
-								/>
+							<Button loading={isLoading} type="submit">
+								Run Simulation
 							</Button>
+							x
+							<TextField.Root
+								type="number"
+								id={'batch.count'}
+								name={'batch.count'}
+								value={simulationCount}
+								style={{ width: 95, textAlign: 'left' }}
+								onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+									const { value } = e.target;
+									let newValue: FormValue =
+										value === '' ? '' : parseFloat(value);
+									setSimulationCount(newValue);
+								}}
+								step={1}
+							/>
 						</Flex>
 					</Flex>
 				</Form>
