@@ -9,6 +9,7 @@ import { SimulationViewEnum } from 'types';
 type AgentData = Record<string, number>;
 type DataFrame = Record<string, AgentData>;
 type DataPoint = [number, number, DataFrame];
+type DataSet = [DataPoint[]];
 
 // Output data to the plot
 type PlottedAgentData = Record<string, number[]>;
@@ -35,7 +36,7 @@ const App = () => {
 	const [simulationView, setSimulationView] =
 		useState<SimulationViewEnum>('Both');
 
-	const { isLoading, data } = useQuery({
+	const { data } = useQuery({
 		queryKey: [`queryAPI${simulationCount}`],
 		refetchInterval: 3000, // 3 second pings of data
 		placeholderData: (prev) => prev,
