@@ -112,7 +112,10 @@ const App = () => {
 							: []
 					}
 					layout={{
-						title: 'Position & Velocity',
+						title:
+							simulationView == 'Position' || simulationView == 'Velocity'
+								? simulationView
+								: 'Position & Velocity',
 						scene: {
 							xaxis: { title: 'X' },
 							yaxis: { title: 'Y' },
