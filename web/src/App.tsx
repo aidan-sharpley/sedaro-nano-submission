@@ -41,14 +41,11 @@ const App = () => {
 		refetchInterval: 3000, // 3 second pings of data
 		placeholderData: (prev) => prev,
 		queryFn: () =>
-			fetch(`http://localhost:8000/simulation?batch=${simulationCount}`).then(
+			fetch(`http://localhost:8000/simulation?limit=${simulationCount}`).then(
 				(res) => res.json()
 			),
 		enabled: !!simulationCount,
 	});
-
-	console.log('fk');
-	console.log(data);
 
 	useEffect(() => {
 		// data should be populated from a POST call to the simulation server
@@ -64,8 +61,8 @@ const App = () => {
 					for (let [agentId, { x, y, z, vx, vy, vz }] of Object.entries(
 						frame
 					)) {
-						const positionID = 'P' + i + agentId;
-						const velocityID = 'V' + i + agentId;
+						const positionID = i + 'P' + agentId;
+						const velocityID = i + 'V' + agentId;
 
 						updatedPositionData[positionID] =
 							updatedPositionData[positionID] || baseData(positionID);
@@ -85,7 +82,6 @@ const App = () => {
 				console.log('Set plot data!');
 			});
 
-			console.log('huh');
 			setPositionData(combinedPositionData);
 			setVelocityData(combinedVelocityData);
 		} catch (error) {

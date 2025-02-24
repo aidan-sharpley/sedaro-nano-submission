@@ -55,14 +55,11 @@ def health():
 
 @app.get('/simulation')
 def get_data():
-    # Get most recent simulation from database
-    simulation: List[Simulation] = (
-        Simulation.query.order_by(Simulation.id.desc()).limit(2).all()
-    )
+    limit = request.args.get('limit')
 
-    print('hm')
-    print([s.data for s in simulation])
-    print(len([s.data for s in simulation]))
+    simulation: List[Simulation] = (
+        Simulation.query.order_by(Simulation.id.desc()).limit(limit=limit).all()
+    )
 
     return [json.loads(s.data) for s in simulation]
 
