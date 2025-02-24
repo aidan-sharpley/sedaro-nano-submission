@@ -51,6 +51,10 @@ class QRangeStore:
         self.store.append((low, high, value))
 
     def __getitem__(self, key: int | float):
+        # It does not matter if the time series is reversed
+        # here because only one set of attributes per Body
+        # will occupy the same time range, you'll only
+        # see at most one of each.
         return list(self.store_search_generator(key))
 
     def store_search_generator(self, key: int | float):
