@@ -14,14 +14,16 @@ type DataPoint = [number, number, DataFrame];
 type PlottedAgentData = Record<string, number[]>;
 type PlottedFrame = Record<string, PlottedAgentData>;
 
-const baseData = () => ({
+const baseData = (name: string) => ({
 	x: [],
 	y: [],
 	z: [],
+	t: [],
 	type: 'scatter3d',
 	mode: 'lines+markers',
 	marker: { size: 4 },
 	line: { width: 2 },
+	name: name,
 });
 
 const App = () => {
@@ -34,10 +36,13 @@ const App = () => {
 		useState<SimulationViewEnum>('Both');
 
 	const { isLoading, data } = useQuery({
-		queryKey: ['queryAPI'],
+		queryKey: [`queryAPI${simulationCount}`],
 		refetchInterval: 3000, // 3 second pings of data
+		placeholderData: (prev) => prev,
 		queryFn: () =>
-			fetch(`http://localhost:8000/simulation`).then((res) => res.json()),
+			fetch(`http://localhost:8000/simulation?batch=${simulationCount}`).then(
+				(res) => res.json()
+			),
 		enabled: !!simulationCount,
 	});
 
@@ -50,13 +55,13 @@ const App = () => {
 			(data as DataPoint[]).forEach(([t0, t1, frame]) => {
 				for (let [agentId, { x, y, z, vx, vy, vz }] of Object.entries(frame)) {
 					updatedPositionData[agentId] =
-						updatedPositionData[agentId] || baseData();
+						updatedPositionData[agentId] || baseData('P' + agentId);
 					updatedPositionData[agentId].x.push(x);
 					updatedPositionData[agentId].y.push(y);
 					updatedPositionData[agentId].z.push(z);
 
 					updatedVelocityData[agentId] =
-						updatedVelocityData[agentId] || baseData();
+						updatedVelocityData[agentId] || baseData('V' + agentId);
 					updatedVelocityData[agentId].x.push(vx);
 					updatedVelocityData[agentId].y.push(vy);
 					updatedVelocityData[agentId].z.push(vz);
