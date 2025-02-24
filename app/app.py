@@ -11,7 +11,7 @@ from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
-from models import SimulateRequest
+from models import Body, SimulateRequest
 from simulator import Simulator
 from store import QRangeStore
 
@@ -74,7 +74,10 @@ def simulate():
         return 'bad request', 400
 
     # Run batch of simulations with additional increments
-    for _ in range(0, int(limit), 1):
+    for i in range(0, int(limit), 1):
+        payload.Body1 = increment_input(payload.Body1, payload.Batch, i)
+        payload.Body2 = increment_input(payload.Body2, payload.Batch, i)
+
         # Create store and simulator
         simulator = Simulator(
             store=QRangeStore(),
@@ -94,3 +97,16 @@ def session_commit(simulation: Simulation):
     with app.app_context():
         db.session.add(simulation)
         db.session.commit()
+
+
+def increment_input(input: Body, incr: Body, idx: int):
+    return Body(
+        agentId=input.agentId,
+        x=input.x + (incr.x * idx),
+        y=input.y + (incr.y * idx),
+        z=input.z + (incr.z * idx),
+        vx=input.vx + (incr.vx * idx),
+        vy=input.vy + (incr.vy * idx),
+        vz=input.vz + (incr.vz * idx),
+        mass=input.mass + (incr.mass * idx),
+    )
