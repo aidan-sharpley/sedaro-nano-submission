@@ -1,4 +1,4 @@
-import { Flex, Heading, Table, Tooltip } from '@radix-ui/themes';
+import { Flex, Table, Tooltip } from '@radix-ui/themes';
 import _ from 'lodash';
 import React from 'react';
 import Input from './Input';
@@ -64,6 +64,7 @@ function BaseCard({
 						rowKey={'Position'}
 						fontSize={fontSize}
 						required={required}
+						enabled={enabled}
 					/>
 					<BodyRow
 						formData={formData}
@@ -72,6 +73,7 @@ function BaseCard({
 						rowKey={'Velocity'}
 						fontSize={fontSize}
 						required={required}
+						enabled={enabled}
 					/>
 					<Table.Row align={'center'} key={`Mass-key`}>
 						<Table.RowHeaderCell style={{ fontSize: fontSize }}>

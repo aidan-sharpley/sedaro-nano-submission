@@ -8,6 +8,7 @@ type BodyRowProps = {
 	setFormData: React.Dispatch<React.SetStateAction<FormData>>;
 	title: string;
 	required?: boolean;
+	enabled?: boolean;
 	fontSize?: number;
 	rowKey: 'Position' | 'Velocity' | 'Mass';
 };
@@ -19,6 +20,7 @@ function BodyRow({
 	required = true,
 	fontSize = 12,
 	rowKey,
+	enabled,
 }: BodyRowProps) {
 	const ifVelocityRowField = rowKey == 'Velocity' ? 'v' : '';
 
@@ -33,6 +35,7 @@ function BodyRow({
 				setFormData={setFormData}
 				title={title}
 				required={required}
+				enabled={enabled}
 			/>
 			<Input
 				field={ifVelocityRowField + 'y'}
@@ -40,6 +43,7 @@ function BodyRow({
 				setFormData={setFormData}
 				title={title}
 				required={required}
+				enabled={enabled}
 			/>
 			<Input
 				field={ifVelocityRowField + 'z'}
@@ -47,6 +51,7 @@ function BodyRow({
 				setFormData={setFormData}
 				title={title}
 				required={required}
+				enabled={enabled}
 			/>
 		</Table.Row>
 	);

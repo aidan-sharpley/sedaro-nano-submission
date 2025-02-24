@@ -37,7 +37,7 @@ const App = () => {
 		useState<SimulationViewEnum>('Both');
 
 	const { data, refetch } = useQuery({
-		queryKey: [`queryAPI${simulationCount}`],
+		queryKey: [`queryAPI`],
 		placeholderData: (prev) => prev,
 		queryFn: () =>
 			fetch(`http://localhost:8000/simulation?limit=${simulationCount}`).then(

@@ -30,6 +30,7 @@ function Input({
 					id={`${title}.${field ?? ''}`}
 					name={`${title}.${field}`}
 					value={formData?.[title]?.[field]}
+					disabled={!enabled}
 					onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 						const { name, value } = e.target;
 						let newValue: FormValue = value === '' ? '' : parseFloat(value);
