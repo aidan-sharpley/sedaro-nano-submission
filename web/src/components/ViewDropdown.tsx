@@ -20,7 +20,7 @@ const ViewDropdown = ({
 	return (
 		<DropdownMenu.Root>
 			<DropdownMenu.Trigger asChild>
-				<Button type="submit">
+				<Button type="button" color="blue">
 					View: {simulationView == 'Both' ? 'P&V' : simulationView}
 				</Button>
 			</DropdownMenu.Trigger>

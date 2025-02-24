@@ -62,8 +62,8 @@ const SimulateForm = ({
 				style={{
 					opacity: '99%',
 					backgroundColor: 'transparent',
-
 					overflowY: 'auto',
+					minWidth: '330px',
 					...style,
 				}}
 			>
@@ -98,7 +98,7 @@ const SimulateForm = ({
 							/>
 
 							<Button type="submit">
-								Simulation Loops:
+								Run Simulation(s)
 								<TextField.Root
 									type="number"
 									id={'batch.count'}
