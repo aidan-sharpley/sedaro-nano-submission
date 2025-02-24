@@ -2,7 +2,6 @@
 
 
 import json
-from threading import Thread
 from typing import List
 
 from flask import Flask, request
@@ -87,16 +86,13 @@ def simulate():
         # Run simulation
         simulation_data = simulator.simulate()
 
-        # Don't hold up response with commit to DB, for speed. Would not do this if strong consistency is required in the system, but figured the entire simulation should fail if it can't commit in a real world situation.
-        Thread(target=session_commit, args=(Simulation(data=simulation_data),)).start()
+        # Roll up sim runs
+        db.session.add(Simulation(data=simulation_data))
+
+    # Return after commit so we know exactly when to refresh with the hacky refresh workaround in the UI.
+    db.session.commit()
 
     return ''
-
-
-def session_commit(simulation: Simulation):
-    with app.app_context():
-        db.session.add(simulation)
-        db.session.commit()
 
 
 def increment_input(input: Body, incr: Body, idx: int):

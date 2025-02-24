@@ -11,6 +11,7 @@ import {
 	defaultBody2,
 } from 'types';
 import ViewDropdown from './ViewDropdown';
+import { QueryObserverResult, RefetchOptions } from '@tanstack/react-query';
 
 type SimulateFormProps = {
 	style?: object;
@@ -18,6 +19,9 @@ type SimulateFormProps = {
 	simulationCount?: number;
 	simulationView?: SimulationViewEnum;
 	setSimulationView: React.Dispatch<React.SetStateAction<SimulationViewEnum>>;
+	refreshData: (
+		options?: RefetchOptions
+	) => Promise<QueryObserverResult<any, Error>>;
 };
 
 const SimulateForm = ({
@@ -26,6 +30,7 @@ const SimulateForm = ({
 	simulationCount = 1,
 	simulationView,
 	setSimulationView,
+	refreshData,
 }: SimulateFormProps) => {
 	const [formData, setFormData] = useState<FormData>({
 		Body1: defaultBody1,
@@ -33,29 +38,31 @@ const SimulateForm = ({
 		Batch: defaultBatch,
 	});
 
-	const handleSubmit = useCallback(
-		async (e: React.FormEvent) => {
-			e.preventDefault();
-			try {
-				const response = await fetch(
-					`http://localhost:8000/simulation?limit=${simulationCount}`,
-					{
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/json',
-						},
-						body: JSON.stringify(formData),
-					}
-				);
-				if (!response.ok) {
-					throw new Error('Network response was not ok');
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+		try {
+			const response = await fetch(
+				`http://localhost:8000/simulation?limit=${simulationCount}`,
+				{
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify(formData),
 				}
-			} catch (error) {
-				console.error('Error:', error);
+			);
+			if (!response.ok) {
+				throw new Error('Network response was not ok');
 			}
-		},
-		[formData]
-	);
+
+			// This is a hacky workaround due to time constraints,
+			// ideally we would get our updated data from the post.
+			// Alternatively, we could probably use rpc or server sent events.
+			refreshData();
+		} catch (error) {
+			console.error('Error:', error);
+		}
+	};
 
 	return (
 		<Flex>

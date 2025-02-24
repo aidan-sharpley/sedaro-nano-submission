@@ -36,15 +36,13 @@ const App = () => {
 	const [simulationView, setSimulationView] =
 		useState<SimulationViewEnum>('Both');
 
-	const { data } = useQuery({
+	const { data, refetch } = useQuery({
 		queryKey: [`queryAPI${simulationCount}`],
-		refetchInterval: 3000, // 3 second pings of data
 		placeholderData: (prev) => prev,
 		queryFn: () =>
 			fetch(`http://localhost:8000/simulation?limit=${simulationCount}`).then(
 				(res) => res.json()
 			),
-		enabled: !!simulationCount,
 	});
 
 	useEffect(() => {
@@ -113,6 +111,7 @@ const App = () => {
 					simulationCount={simulationCount}
 					simulationView={simulationView}
 					setSimulationView={setSimulationView}
+					refreshData={refetch}
 				/>
 			</Flex>
 			<Flex width={'100%'} height={'100%'} position={'absolute'}>
