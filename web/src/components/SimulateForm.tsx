@@ -23,7 +23,7 @@ type SimulateFormProps = {
 const SimulateForm = ({
 	style,
 	setSimulationCount,
-	simulationCount,
+	simulationCount = 1,
 	simulationView,
 	setSimulationView,
 }: SimulateFormProps) => {
@@ -37,13 +37,16 @@ const SimulateForm = ({
 		async (e: React.FormEvent) => {
 			e.preventDefault();
 			try {
-				const response = await fetch('http://localhost:8000/simulation', {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify(formData),
-				});
+				const response = await fetch(
+					`http://localhost:8000/simulation?limit=${simulationCount}`,
+					{
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+						},
+						body: JSON.stringify(formData),
+					}
+				);
 				if (!response.ok) {
 					throw new Error('Network response was not ok');
 				}

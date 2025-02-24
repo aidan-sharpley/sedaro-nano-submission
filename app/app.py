@@ -58,7 +58,7 @@ def get_data():
     limit = request.args.get('limit')
 
     simulation: List[Simulation] = (
-        Simulation.query.order_by(Simulation.id.desc()).limit(limit=limit).all()
+        Simulation.query.order_by(Simulation.id.desc()).limit(limit=int(limit)).all()
     )
 
     return [json.loads(s.data) for s in simulation]
@@ -66,6 +66,8 @@ def get_data():
 
 @app.post('/simulation')
 def simulate():
+    limit = request.args.get('limit')
+
     payload = SimulateRequest(request.get_json())
     if not payload:
         print('failed to parse json from request')
@@ -81,9 +83,10 @@ def simulate():
     simulation_data = simulator.simulate()
 
     # Don't hold up response with commit to DB, for speed. Would not do this if strong consistency is required in the system, but figured the entire simulation should fail if it can't commit in a real world situation.
-    Thread(target=session_commit, args=(Simulation(data=simulation_data),)).start()
+    for _ in range(0, int(limit), 1):
+        Thread(target=session_commit, args=(Simulation(data=simulation_data),)).start()
 
-    return app.response_class(response=simulation_data, mimetype='application/json')
+    return ''
 
 
 def session_commit(simulation: Simulation):
