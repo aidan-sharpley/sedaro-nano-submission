@@ -1,7 +1,9 @@
 # HTTP SERVER
 
 
+import json
 from threading import Thread
+from typing import List
 
 from flask import Flask, request
 from flask_compress import Compress
@@ -54,10 +56,15 @@ def health():
 @app.get('/simulation')
 def get_data():
     # Get most recent simulation from database
-    simulation: Simulation = Simulation.query.order_by(Simulation.id.desc()).first()
-    return app.response_class(
-        response=simulation.data if simulation else [], mimetype='application/json'
+    simulation: List[Simulation] = (
+        Simulation.query.order_by(Simulation.id.desc()).limit(2).all()
     )
+
+    print('hm')
+    print([s.data for s in simulation])
+    print(len([s.data for s in simulation]))
+
+    return [json.loads(s.data) for s in simulation]
 
 
 @app.post('/simulation')

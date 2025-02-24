@@ -9,7 +9,7 @@ import { SimulationViewEnum } from 'types';
 type AgentData = Record<string, number>;
 type DataFrame = Record<string, AgentData>;
 type DataPoint = [number, number, DataFrame];
-type DataSet = [DataPoint[]];
+type DataSet = DataPoint[][];
 
 // Output data to the plot
 type PlottedAgentData = Record<string, number[]>;
@@ -47,30 +47,47 @@ const App = () => {
 		enabled: !!simulationCount,
 	});
 
+	console.log('fk');
+	console.log(data);
+
 	useEffect(() => {
+		// data should be populated from a POST call to the simulation server
+		const combinedPositionData: PlottedAgentData[] = [];
+		const combinedVelocityData: PlottedAgentData[] = [];
+
 		try {
-			// data should be populated from a POST call to the simulation server
-			const updatedPositionData: PlottedFrame = {};
-			const updatedVelocityData: PlottedFrame = {};
+			(data as DataSet).forEach((ds, i) => {
+				const updatedPositionData: PlottedFrame = {};
+				const updatedVelocityData: PlottedFrame = {};
 
-			(data as DataPoint[]).forEach(([t0, t1, frame]) => {
-				for (let [agentId, { x, y, z, vx, vy, vz }] of Object.entries(frame)) {
-					updatedPositionData[agentId] =
-						updatedPositionData[agentId] || baseData('P' + agentId);
-					updatedPositionData[agentId].x.push(x);
-					updatedPositionData[agentId].y.push(y);
-					updatedPositionData[agentId].z.push(z);
+				ds.forEach(([t0, t1, frame]) => {
+					for (let [agentId, { x, y, z, vx, vy, vz }] of Object.entries(
+						frame
+					)) {
+						const positionID = 'P' + i + agentId;
+						const velocityID = 'V' + i + agentId;
 
-					updatedVelocityData[agentId] =
-						updatedVelocityData[agentId] || baseData('V' + agentId);
-					updatedVelocityData[agentId].x.push(vx);
-					updatedVelocityData[agentId].y.push(vy);
-					updatedVelocityData[agentId].z.push(vz);
-				}
+						updatedPositionData[positionID] =
+							updatedPositionData[positionID] || baseData(positionID);
+						updatedPositionData[positionID].x.push(x);
+						updatedPositionData[positionID].y.push(y);
+						updatedPositionData[positionID].z.push(z);
+
+						updatedVelocityData[velocityID] =
+							updatedVelocityData[velocityID] || baseData(velocityID);
+						updatedVelocityData[velocityID].x.push(vx);
+						updatedVelocityData[velocityID].y.push(vy);
+						updatedVelocityData[velocityID].z.push(vz);
+					}
+				});
+				combinedPositionData.push(...Object.values(updatedPositionData));
+				combinedVelocityData.push(...Object.values(updatedVelocityData));
+				console.log('Set plot data!');
 			});
-			setPositionData(Object.values(updatedPositionData));
-			setVelocityData(Object.values(updatedVelocityData));
-			console.log('Set plot data!');
+
+			console.log('huh');
+			setPositionData(combinedPositionData);
+			setVelocityData(combinedVelocityData);
 		} catch (error) {
 			console.error('Error fetching data:', error);
 		}
